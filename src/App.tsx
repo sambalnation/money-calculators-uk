@@ -1,3 +1,4 @@
+import { CompoundGrowthCalculator } from './pages/CompoundGrowthCalculator';
 import { TakeHomeCalculator } from './pages/TakeHomeCalculator';
 
 export default function App() {
@@ -23,14 +24,14 @@ export default function App() {
 
         <main className="space-y-6">
           <TakeHomeCalculator />
+          <CompoundGrowthCalculator />
 
           <section className="rounded-2xl border border-white/10 bg-white/5 p-5">
             <h2 className="text-lg font-semibold">Coming next</h2>
             <ul className="mt-3 grid gap-2 text-sm text-white/70 md:grid-cols-2">
-              <li className="rounded-xl border border-white/10 bg-bg-900/40 p-3">Pay rise impact (marginal rate)</li>
-              <li className="rounded-xl border border-white/10 bg-bg-900/40 p-3">Compound interest / savings growth</li>
-              <li className="rounded-xl border border-white/10 bg-bg-900/40 p-3">Pension contribution impact</li>
               <li className="rounded-xl border border-white/10 bg-bg-900/40 p-3">Emergency fund runway</li>
+              <li className="rounded-xl border border-white/10 bg-bg-900/40 p-3">Pay rise impact (marginal rate)</li>
+              <li className="rounded-xl border border-white/10 bg-bg-900/40 p-3">Pension contribution impact (with “not sure” mode)</li>
             </ul>
           </section>
         </main>
