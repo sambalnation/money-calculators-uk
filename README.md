@@ -4,7 +4,7 @@ A dark, neon fintech-style calculator hub for UK money nerds.
 
 **Goal:** lots of useful UK calculators in one place (educational estimates, not financial advice).
 
-## What’s in v0.3
+## What’s in v0.4
 - UK take‑home pay calculator (England/Wales/NI)
   - Income tax + employee NI (simplified)
   - Clear assumptions panel
@@ -20,6 +20,10 @@ A dark, neon fintech-style calculator hub for UK money nerds.
 - Pay rise impact
   - Delta view: how much of a gross pay rise you keep after tax + NI
   - Uses the same simplified tax/NI model as take-home
+  - Unit-tested calculation core
+- Pension contribution impact
+  - Salary sacrifice vs net pay arrangement vs relief at source
+  - Includes “not sure” mode that shows a range
   - Unit-tested calculation core
 
 ## Run locally
@@ -38,4 +42,4 @@ This project is for education and estimation. Not financial advice.
 Always verify results against payroll/HMRC and your own situation.
 
 ## Next calculators to add
-- Pension contribution impact (salary sacrifice vs net pay vs relief-at-source — with a "not sure" mode)
+- More: student loan impact, ISA vs pension lens, mortgage overpayment, inflation-adjusted growth, etc.
