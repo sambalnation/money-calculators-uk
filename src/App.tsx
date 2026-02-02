@@ -1,4 +1,5 @@
 import { CompoundGrowthCalculator } from './pages/CompoundGrowthCalculator';
+import { InflationAdjustedGrowthCalculator } from './pages/InflationAdjustedGrowthCalculator';
 import { EmergencyFundRunwayCalculator } from './pages/EmergencyFundRunwayCalculator';
 import { PayRiseImpactCalculator } from './pages/PayRiseImpactCalculator';
 import { PensionContributionImpactCalculator } from './pages/PensionContributionImpactCalculator';
@@ -28,6 +29,7 @@ export default function App() {
         <main className="space-y-6">
           <TakeHomeCalculator />
           <CompoundGrowthCalculator />
+          <InflationAdjustedGrowthCalculator />
           <EmergencyFundRunwayCalculator />
           <PayRiseImpactCalculator />
           <PensionContributionImpactCalculator />

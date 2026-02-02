@@ -4,7 +4,7 @@ A dark, neon fintech-style calculator hub for UK money nerds.
 
 **Goal:** lots of useful UK calculators in one place (educational estimates, not financial advice).
 
-## What’s in v0.4
+## What’s in v0.5
 - UK take‑home pay calculator (England/Wales/NI)
   - Income tax + employee NI (simplified)
   - Clear assumptions panel
@@ -13,6 +13,10 @@ A dark, neon fintech-style calculator hub for UK money nerds.
   - Monthly contributions + monthly compounding (end-of-month deposits)
   - Clear assumptions + year-by-year breakdown
   - Unit-tested math core (matches closed-form formula)
+- Inflation-adjusted growth calculator
+  - Nominal vs real (today’s £) projections
+  - Clear assumptions + year-by-year breakdown
+  - Unit-tested calculation core
 - Emergency fund runway
   - Monthly burn vs cash balance
   - Clear assumptions panel
