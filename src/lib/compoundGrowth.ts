@@ -1,7 +1,9 @@
+export type ContributionTiming = 'startOfPeriod' | 'endOfPeriod';
+
 export type CompoundGrowthInputs = {
   /** Current pot value */
   startingBalance: number;
-  /** Regular contribution each month (assumed end of month) */
+  /** Regular contribution each month */
   monthlyContribution: number;
   /** Nominal annual growth rate, e.g. 5 for 5% */
   annualRatePct: number;
@@ -9,6 +11,12 @@ export type CompoundGrowthInputs = {
   years: number;
   /** Number of compounding periods per year (defaults to monthly). */
   periodsPerYear?: number;
+  /**
+   * When contributions are applied relative to growth.
+   * - endOfPeriod: grow then deposit (typical "end of month" savings)
+   * - startOfPeriod: deposit then grow (annuity due; closer to "start of month" investing)
+   */
+  contributionTiming?: ContributionTiming;
 };
 
 export type CompoundGrowthYearRow = {
@@ -35,7 +43,7 @@ function clampNonNegative(n: number) {
  * Assumptions:
  * - Growth is constant (nominal annual rate).
  * - Compounding happens evenly each period.
- * - Contributions are made at the end of each period.
+ * - Contributions are made at either the start or end of each period (configurable).
  */
 export function computeCompoundGrowth(raw: CompoundGrowthInputs): CompoundGrowthResult {
   const periodsPerYear = Math.max(1, Math.round(raw.periodsPerYear ?? 12));
@@ -43,6 +51,7 @@ export function computeCompoundGrowth(raw: CompoundGrowthInputs): CompoundGrowth
   const monthlyContribution = clampNonNegative(raw.monthlyContribution);
   const years = Math.max(0, Math.round(raw.years));
   const annualRatePct = Number.isFinite(raw.annualRatePct) ? raw.annualRatePct : 0;
+  const contributionTiming: ContributionTiming = raw.contributionTiming ?? 'endOfPeriod';
 
   const totalPeriods = years * periodsPerYear;
   const contributionPerPeriod = monthlyContribution * (12 / periodsPerYear);
@@ -54,10 +63,17 @@ export function computeCompoundGrowth(raw: CompoundGrowthInputs): CompoundGrowth
   const yearly: CompoundGrowthYearRow[] = [];
 
   for (let p = 1; p <= totalPeriods; p++) {
-    // Growth first, then contribution (end-of-period deposits).
-    balance = balance * (1 + periodicRate);
-    balance = balance + contributionPerPeriod;
-    contributed += contributionPerPeriod;
+    if (contributionTiming === 'startOfPeriod') {
+      // Deposit first, then growth.
+      balance = balance + contributionPerPeriod;
+      contributed += contributionPerPeriod;
+      balance = balance * (1 + periodicRate);
+    } else {
+      // Growth first, then deposit (end-of-period deposits).
+      balance = balance * (1 + periodicRate);
+      balance = balance + contributionPerPeriod;
+      contributed += contributionPerPeriod;
+    }
 
     const isYearEnd = p % periodsPerYear === 0;
     if (isYearEnd) {
@@ -80,6 +96,7 @@ export function computeCompoundGrowth(raw: CompoundGrowthInputs): CompoundGrowth
       annualRatePct,
       years,
       periodsPerYear,
+      contributionTiming,
     },
     finalBalance,
     totalContributed,

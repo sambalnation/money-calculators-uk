@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Card } from '../components/Card';
 import { NumberInput } from '../components/NumberInput';
-import { computeCompoundGrowth } from '../lib/compoundGrowth';
+import { computeCompoundGrowth, type ContributionTiming } from '../lib/compoundGrowth';
 
 function fmtGBP(n: number) {
   return new Intl.NumberFormat('en-GB', {
@@ -15,23 +15,33 @@ function fmtPct(n: number) {
   return `${n.toFixed(2)}%`;
 }
 
+function timingLabel(t: ContributionTiming) {
+  return t === 'startOfPeriod' ? 'Start of month (deposit then grow)' : 'End of month (grow then deposit)';
+}
+
 export function CompoundGrowthCalculator() {
   const [startingBalance, setStartingBalance] = useState(5_000);
   const [monthlyContribution, setMonthlyContribution] = useState(250);
   const [annualRatePct, setAnnualRatePct] = useState(6);
   const [years, setYears] = useState(10);
+  const [contributionTiming, setContributionTiming] = useState<ContributionTiming>('endOfPeriod');
 
   const result = useMemo(
-    () => computeCompoundGrowth({ startingBalance, monthlyContribution, annualRatePct, years, periodsPerYear: 12 }),
-    [startingBalance, monthlyContribution, annualRatePct, years],
+    () =>
+      computeCompoundGrowth({
+        startingBalance,
+        monthlyContribution,
+        annualRatePct,
+        years,
+        periodsPerYear: 12,
+        contributionTiming,
+      }),
+    [startingBalance, monthlyContribution, annualRatePct, years, contributionTiming],
   );
 
   return (
     <div className="grid gap-5 lg:grid-cols-2">
-      <Card
-        title="Compound growth"
-        subtitle="Savings / investing growth estimate with monthly contributions (end of month)."
-      >
+      <Card title="Compound growth" subtitle="Savings / investing growth estimate with monthly contributions.">
         <div className="grid gap-4">
           <NumberInput label="Starting balance" prefix="£" value={startingBalance} onChange={setStartingBalance} />
           <NumberInput
@@ -49,11 +59,34 @@ export function CompoundGrowthCalculator() {
           />
           <NumberInput label="Time horizon" value={years} onChange={setYears} hint="years" />
 
+          <div className="rounded-xl border border-white/10 bg-bg-900/40 p-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-sm font-medium text-white/80">Contribution timing</p>
+                <p className="text-xs text-white/50">
+                  If you invest at the start of the month, you usually get a tiny boost vs end-of-month saving.
+                </p>
+              </div>
+              <select
+                className="rounded-xl border border-white/10 bg-bg-900/70 px-3 py-2 text-sm text-white/80 outline-none"
+                value={contributionTiming}
+                onChange={(e) => setContributionTiming(e.target.value as ContributionTiming)}
+              >
+                <option value="endOfPeriod">End of month</option>
+                <option value="startOfPeriod">Start of month</option>
+              </select>
+            </div>
+
+            <p className="mt-3 text-xs text-white/60">
+              Currently selected: <span className="font-medium text-white/75">{timingLabel(contributionTiming)}</span>
+            </p>
+          </div>
+
           <div className="rounded-xl border border-white/10 bg-bg-900/40 p-4 text-xs text-white/60">
             <p className="font-medium text-white/70">Assumptions (read me)</p>
             <ul className="mt-2 list-disc space-y-1 pl-4">
               <li>Constant annual growth rate ({fmtPct(result.inputs.annualRatePct)}) with monthly compounding.</li>
-              <li>Contributions happen at the <span className="text-white/70">end</span> of each month.</li>
+              <li>Contributions are applied: <span className="text-white/70">{timingLabel(contributionTiming)}</span>.</li>
               <li>Ignores fees, taxes, inflation, and volatility (real investing is messier).</li>
             </ul>
             <p className="mt-3">
