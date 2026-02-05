@@ -9,25 +9,37 @@ function closedForm({
   startingBalance,
   contributionPerPeriod,
   periodicRate,
+  periodicFeeRate,
   periods,
   timing,
 }: {
   startingBalance: number;
   contributionPerPeriod: number;
   periodicRate: number;
+  periodicFeeRate: number;
   periods: number;
   timing: 'endOfPeriod' | 'startOfPeriod';
 }) {
   if (periods === 0) return startingBalance;
-  const growth = Math.pow(1 + periodicRate, periods);
 
-  if (periodicRate === 0) {
-    // With 0% growth, timing doesn't matter.
-    return startingBalance + contributionPerPeriod * periods;
+  // In our model, each period applies:
+  // - growth by (1+r)
+  // - fee by (1-fee)
+  // so the net multiplicative factor is A = (1+r)*(1-fee)
+  const A = (1 + periodicRate) * (1 - periodicFeeRate);
+
+  // End-of-period deposits: B_k = B_{k-1}*A + PMT
+  // Start-of-period deposits: B_k = (B_{k-1}+PMT)*A = B_{k-1}*A + PMT*A
+  const growth = Math.pow(A, periods);
+
+  if (A === 1) {
+    // No net growth (could be r=0 and fee=0, or they cancel out).
+    const timingFactor = timing === 'startOfPeriod' ? A : 1;
+    return startingBalance + contributionPerPeriod * periods * timingFactor;
   }
 
-  const annuity = contributionPerPeriod * ((growth - 1) / periodicRate);
-  const timingFactor = timing === 'startOfPeriod' ? (1 + periodicRate) : 1;
+  const annuity = contributionPerPeriod * ((growth - 1) / (A - 1));
+  const timingFactor = timing === 'startOfPeriod' ? A : 1;
 
   return startingBalance * growth + annuity * timingFactor;
 }
@@ -65,11 +77,12 @@ describe('computeCompoundGrowth', () => {
     expect(start.finalBalance).toBeCloseTo(end.finalBalance, 6);
   });
 
-  it('matches closed form for monthly compounding + end-of-month contributions', () => {
+  it('matches closed form for monthly compounding + end-of-month contributions (no fees)', () => {
     const inputs = {
       startingBalance: 5000,
       monthlyContribution: 250,
       annualRatePct: 6,
+      annualFeePct: 0,
       years: 10,
       periodsPerYear: 12,
       contributionTiming: 'endOfPeriod' as const,
@@ -77,11 +90,13 @@ describe('computeCompoundGrowth', () => {
     const r = computeCompoundGrowth(inputs);
 
     const periodicRate = (inputs.annualRatePct / 100) / 12;
+    const periodicFeeRate = (inputs.annualFeePct / 100) / 12;
     const periods = inputs.years * 12;
     const expected = closedForm({
       startingBalance: inputs.startingBalance,
       contributionPerPeriod: inputs.monthlyContribution,
       periodicRate,
+      periodicFeeRate,
       periods,
       timing: inputs.contributionTiming,
     });
@@ -89,11 +104,12 @@ describe('computeCompoundGrowth', () => {
     expect(r.finalBalance).toBeCloseTo(expected, 6);
   });
 
-  it('matches closed form for monthly compounding + start-of-month contributions (annuity due)', () => {
+  it('matches closed form for monthly compounding + start-of-month contributions (annuity due; no fees)', () => {
     const inputs = {
       startingBalance: 5000,
       monthlyContribution: 250,
       annualRatePct: 6,
+      annualFeePct: 0,
       years: 10,
       periodsPerYear: 12,
       contributionTiming: 'startOfPeriod' as const,
@@ -101,11 +117,13 @@ describe('computeCompoundGrowth', () => {
     const r = computeCompoundGrowth(inputs);
 
     const periodicRate = (inputs.annualRatePct / 100) / 12;
+    const periodicFeeRate = (inputs.annualFeePct / 100) / 12;
     const periods = inputs.years * 12;
     const expected = closedForm({
       startingBalance: inputs.startingBalance,
       contributionPerPeriod: inputs.monthlyContribution,
       periodicRate,
+      periodicFeeRate,
       periods,
       timing: inputs.contributionTiming,
     });
@@ -118,6 +136,7 @@ describe('computeCompoundGrowth', () => {
       startingBalance: 0,
       monthlyContribution: 100,
       annualRatePct: 5,
+      annualFeePct: 0,
       years: 10,
       periodsPerYear: 12,
     };
@@ -133,6 +152,7 @@ describe('computeCompoundGrowth', () => {
       startingBalance: 0,
       monthlyContribution: 100,
       annualRatePct: 12,
+      annualFeePct: 0,
       years: 3,
       periodsPerYear: 1,
       contributionTiming: 'endOfPeriod' as const,
@@ -143,5 +163,35 @@ describe('computeCompoundGrowth', () => {
     expect(r.totalContributed).toBeCloseTo(1200 * 3, 6);
     // Sanity: with positive growth, final > contributions.
     expect(r.finalBalance).toBeGreaterThan(r.totalContributed);
+  });
+
+  it('fees reduce the final balance (and match the same closed form with a net factor)', () => {
+    const inputs = {
+      startingBalance: 10_000,
+      monthlyContribution: 200,
+      annualRatePct: 7,
+      annualFeePct: 0.75,
+      years: 15,
+      periodsPerYear: 12,
+      contributionTiming: 'endOfPeriod' as const,
+    };
+
+    const withFee = computeCompoundGrowth(inputs);
+    const noFee = computeCompoundGrowth({ ...inputs, annualFeePct: 0 });
+
+    expect(withFee.finalBalance).toBeLessThan(noFee.finalBalance);
+
+    const periodicRate = (inputs.annualRatePct / 100) / 12;
+    const periodicFeeRate = (inputs.annualFeePct / 100) / 12;
+    const expected = closedForm({
+      startingBalance: inputs.startingBalance,
+      contributionPerPeriod: inputs.monthlyContribution,
+      periodicRate,
+      periodicFeeRate,
+      periods: inputs.years * 12,
+      timing: inputs.contributionTiming,
+    });
+
+    expect(withFee.finalBalance).toBeCloseTo(expected, 6);
   });
 });

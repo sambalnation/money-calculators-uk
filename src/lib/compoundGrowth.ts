@@ -7,6 +7,8 @@ export type CompoundGrowthInputs = {
   monthlyContribution: number;
   /** Nominal annual growth rate, e.g. 5 for 5% */
   annualRatePct: number;
+  /** Optional platform / fund fee (simple % of assets per year). */
+  annualFeePct?: number;
   /** Whole years to run */
   years: number;
   /** Number of compounding periods per year (defaults to monthly). */
@@ -51,11 +53,14 @@ export function computeCompoundGrowth(raw: CompoundGrowthInputs): CompoundGrowth
   const monthlyContribution = clampNonNegative(raw.monthlyContribution);
   const years = Math.max(0, Math.round(raw.years));
   const annualRatePct = Number.isFinite(raw.annualRatePct) ? raw.annualRatePct : 0;
+  const annualFeePctRaw = raw.annualFeePct ?? 0;
+  const annualFeePct = Number.isFinite(annualFeePctRaw) ? annualFeePctRaw : 0;
   const contributionTiming: ContributionTiming = raw.contributionTiming ?? 'endOfPeriod';
 
   const totalPeriods = years * periodsPerYear;
   const contributionPerPeriod = monthlyContribution * (12 / periodsPerYear);
   const periodicRate = (annualRatePct / 100) / periodsPerYear;
+  const periodicFeeRate = Math.max(0, annualFeePct / 100 / periodsPerYear);
 
   let balance = startingBalance;
   let contributed = 0;
@@ -64,13 +69,15 @@ export function computeCompoundGrowth(raw: CompoundGrowthInputs): CompoundGrowth
 
   for (let p = 1; p <= totalPeriods; p++) {
     if (contributionTiming === 'startOfPeriod') {
-      // Deposit first, then growth.
+      // Deposit first, then growth, then fee.
       balance = balance + contributionPerPeriod;
       contributed += contributionPerPeriod;
       balance = balance * (1 + periodicRate);
+      balance = balance * (1 - periodicFeeRate);
     } else {
-      // Growth first, then deposit (end-of-period deposits).
+      // Growth first, then fee, then deposit (end-of-period deposits).
       balance = balance * (1 + periodicRate);
+      balance = balance * (1 - periodicFeeRate);
       balance = balance + contributionPerPeriod;
       contributed += contributionPerPeriod;
     }
@@ -94,6 +101,7 @@ export function computeCompoundGrowth(raw: CompoundGrowthInputs): CompoundGrowth
       startingBalance,
       monthlyContribution,
       annualRatePct,
+      annualFeePct,
       years,
       periodsPerYear,
       contributionTiming,

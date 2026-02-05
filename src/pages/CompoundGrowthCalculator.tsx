@@ -23,6 +23,7 @@ export function CompoundGrowthCalculator() {
   const [startingBalance, setStartingBalance] = useState(5_000);
   const [monthlyContribution, setMonthlyContribution] = useState(250);
   const [annualRatePct, setAnnualRatePct] = useState(6);
+  const [annualFeePct, setAnnualFeePct] = useState(0.5);
   const [years, setYears] = useState(10);
   const [contributionTiming, setContributionTiming] = useState<ContributionTiming>('endOfPeriod');
 
@@ -32,11 +33,12 @@ export function CompoundGrowthCalculator() {
         startingBalance,
         monthlyContribution,
         annualRatePct,
+        annualFeePct,
         years,
         periodsPerYear: 12,
         contributionTiming,
       }),
-    [startingBalance, monthlyContribution, annualRatePct, years, contributionTiming],
+    [startingBalance, monthlyContribution, annualRatePct, annualFeePct, years, contributionTiming],
   );
 
   return (
@@ -55,6 +57,12 @@ export function CompoundGrowthCalculator() {
             label="Annual growth rate (nominal)"
             value={annualRatePct}
             onChange={setAnnualRatePct}
+            hint="% per year"
+          />
+          <NumberInput
+            label="Annual fee (platform/fund)"
+            value={annualFeePct}
+            onChange={setAnnualFeePct}
             hint="% per year"
           />
           <NumberInput label="Time horizon" value={years} onChange={setYears} hint="years" />
@@ -85,9 +93,14 @@ export function CompoundGrowthCalculator() {
           <div className="rounded-xl border border-white/10 bg-bg-900/40 p-4 text-xs text-white/60">
             <p className="font-medium text-white/70">Assumptions (read me)</p>
             <ul className="mt-2 list-disc space-y-1 pl-4">
-              <li>Constant annual growth rate ({fmtPct(result.inputs.annualRatePct)}) with monthly compounding.</li>
+              <li>
+                Constant annual growth rate ({fmtPct(result.inputs.annualRatePct)}) with monthly compounding.
+              </li>
+              <li>
+                Simple fee model: an annual fee of {fmtPct(result.inputs.annualFeePct)} is charged evenly each month as a % of your current balance.
+              </li>
               <li>Contributions are applied: <span className="text-white/70">{timingLabel(contributionTiming)}</span>.</li>
-              <li>Ignores fees, taxes, inflation, and volatility (real investing is messier).</li>
+              <li>Ignores taxes, inflation, and volatility (real investing is messier).</li>
             </ul>
             <p className="mt-3">
               Educational estimates only — not financial advice. For ISA/pension/tax specifics, your result will differ.

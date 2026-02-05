@@ -10,7 +10,8 @@ A dark, neon fintech-style calculator hub for UK money nerds.
   - Clear assumptions panel
   - Unit-tested calculation core
 - Compound growth calculator
-  - Monthly contributions + monthly compounding (end-of-month deposits)
+  - Monthly contributions + monthly compounding (start/end-of-month deposits)
+  - Optional annual fee drag (simple % of assets)
   - Clear assumptions + year-by-year breakdown
   - Unit-tested math core (matches closed-form formula)
 - Inflation-adjusted growth calculator
