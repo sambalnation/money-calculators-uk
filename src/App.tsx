@@ -1,3 +1,5 @@
+import { useEffect, useMemo, useState } from 'react';
+import { Tabs, type TabItem } from './components/Tabs';
 import { CompoundGrowthCalculator } from './pages/CompoundGrowthCalculator';
 import { InflationAdjustedGrowthCalculator } from './pages/InflationAdjustedGrowthCalculator';
 import { EmergencyFundRunwayCalculator } from './pages/EmergencyFundRunwayCalculator';
@@ -5,11 +7,54 @@ import { PayRiseImpactCalculator } from './pages/PayRiseImpactCalculator';
 import { PensionContributionImpactCalculator } from './pages/PensionContributionImpactCalculator';
 import { TakeHomeCalculator } from './pages/TakeHomeCalculator';
 
+type ToolId = 'takehome' | 'compound' | 'inflation' | 'emergency' | 'payrise' | 'pension';
+
+function parseToolFromHash(): ToolId | null {
+  const raw = window.location.hash.replace(/^#/, '');
+  if (!raw) return null;
+  const params = new URLSearchParams(raw);
+  const tool = params.get('tool') as ToolId | null;
+  return tool;
+}
+
+function setToolHash(tool: ToolId) {
+  const params = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+  params.set('tool', tool);
+  window.location.hash = params.toString();
+}
+
 export default function App() {
+  const items: TabItem<ToolId>[] = useMemo(
+    () => [
+      { id: 'takehome', label: 'Take‑home', content: <TakeHomeCalculator /> },
+      { id: 'compound', label: 'Compound growth', content: <CompoundGrowthCalculator /> },
+      { id: 'inflation', label: 'Inflation‑adjusted', content: <InflationAdjustedGrowthCalculator /> },
+      { id: 'emergency', label: 'Emergency fund', content: <EmergencyFundRunwayCalculator /> },
+      { id: 'payrise', label: 'Pay rise', content: <PayRiseImpactCalculator /> },
+      { id: 'pension', label: 'Pension', content: <PensionContributionImpactCalculator /> },
+    ],
+    [],
+  );
+
+  const [active, setActive] = useState<ToolId>(() => parseToolFromHash() ?? 'takehome');
+
+  useEffect(() => {
+    const onHash = () => {
+      const next = parseToolFromHash();
+      if (next) setActive(next);
+    };
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
+
+  useEffect(() => {
+    setToolHash(active);
+  }, [active]);
+
   return (
     <div className="min-h-full">
       <div className="mx-auto max-w-5xl px-4 py-10">
-        <header className="mb-8">
+        <header className="mb-6">
           <div className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-2 shadow-neon">
             <span className="h-2 w-2 rounded-full bg-neon-cyan" />
             <span className="text-xs font-semibold tracking-widest text-white/70">MONEY CALCULATORS UK</span>
@@ -27,12 +72,7 @@ export default function App() {
         </header>
 
         <main className="space-y-6">
-          <TakeHomeCalculator />
-          <CompoundGrowthCalculator />
-          <InflationAdjustedGrowthCalculator />
-          <EmergencyFundRunwayCalculator />
-          <PayRiseImpactCalculator />
-          <PensionContributionImpactCalculator />
+          <Tabs items={items} activeId={active} onChange={setActive} />
 
           <section className="rounded-2xl border border-white/10 bg-white/5 p-5">
             <h2 className="text-lg font-semibold">Coming next</h2>

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Card } from '../components/Card';
 import { NumberInput } from '../components/NumberInput';
+import { YearlyLineChart } from '../components/YearlyLineChart';
 import { computeCompoundGrowth, type ContributionTiming } from '../lib/compoundGrowth';
 
 function fmtGBP(n: number) {
@@ -121,29 +122,55 @@ export function CompoundGrowthCalculator() {
             <Row label="Total growth" value={fmtGBP(result.totalGrowth)} accent="text-neon-pink" />
           </div>
 
-          <details className="rounded-xl border border-white/10 bg-bg-900/30 p-4">
-            <summary className="cursor-pointer select-none text-sm font-medium text-white/70">Year-by-year breakdown</summary>
-            <div className="mt-3 overflow-x-auto">
-              <table className="w-full min-w-[420px] text-left text-xs">
-                <thead className="text-white/50">
-                  <tr>
-                    <th className="py-2">Year</th>
-                    <th className="py-2">End balance</th>
-                    <th className="py-2">Contributed</th>
-                    <th className="py-2">Growth</th>
-                  </tr>
-                </thead>
-                <tbody className="text-white/75">
-                  {result.yearly.map((row) => (
-                    <tr key={row.year} className="border-t border-white/10">
-                      <td className="py-2">{row.year}</td>
-                      <td className="py-2 font-medium text-white/85">{fmtGBP(row.endBalance)}</td>
-                      <td className="py-2 text-white/70">{fmtGBP(row.totalContributed)}</td>
-                      <td className="py-2 text-white/70">{fmtGBP(row.totalGrowth)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          <details className="rounded-xl border border-white/10 bg-bg-900/30 p-4" open>
+            <summary className="cursor-pointer select-none text-sm font-medium text-white/70">Balance over time</summary>
+            <div className="mt-3">
+              <YearlyLineChart
+                years={result.yearly.map((r) => r.year)}
+                valueFormatter={fmtGBP}
+                series={[
+                  {
+                    label: 'End balance',
+                    values: result.yearly.map((r) => r.endBalance),
+                    borderColor: 'rgba(34, 211, 238, 0.95)',
+                    backgroundColor: 'rgba(34, 211, 238, 0.15)',
+                    fill: true,
+                  },
+                  {
+                    label: 'Total contributed',
+                    values: result.yearly.map((r) => r.totalContributed),
+                    borderColor: 'rgba(163, 230, 53, 0.95)',
+                    backgroundColor: 'rgba(163, 230, 53, 0.12)',
+                    fill: false,
+                  },
+                ]}
+              />
+
+              <details className="mt-4 rounded-xl border border-white/10 bg-bg-900/20 p-3">
+                <summary className="cursor-pointer select-none text-xs font-medium text-white/70">Show table</summary>
+                <div className="mt-3 overflow-x-auto">
+                  <table className="w-full min-w-[420px] text-left text-xs">
+                    <thead className="text-white/50">
+                      <tr>
+                        <th className="py-2">Year</th>
+                        <th className="py-2">End balance</th>
+                        <th className="py-2">Contributed</th>
+                        <th className="py-2">Growth</th>
+                      </tr>
+                    </thead>
+                    <tbody className="text-white/75">
+                      {result.yearly.map((row) => (
+                        <tr key={row.year} className="border-t border-white/10">
+                          <td className="py-2">{row.year}</td>
+                          <td className="py-2 font-medium text-white/85">{fmtGBP(row.endBalance)}</td>
+                          <td className="py-2 text-white/70">{fmtGBP(row.totalContributed)}</td>
+                          <td className="py-2 text-white/70">{fmtGBP(row.totalGrowth)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </details>
             </div>
           </details>
         </div>
