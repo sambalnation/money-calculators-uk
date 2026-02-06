@@ -32,9 +32,9 @@ function formatLastUpdated(iso: string) {
 export default function App() {
   const items: TabItem<ToolId>[] = useMemo(
     () => [
-      { id: 'takehome', label: 'Take‑home', content: <TakeHomeCalculator /> },
+      { id: 'takehome', label: 'Take-home', content: <TakeHomeCalculator /> },
       { id: 'compound', label: 'Compound growth', content: <CompoundGrowthCalculator /> },
-      { id: 'inflation', label: 'Inflation‑adjusted', content: <InflationAdjustedGrowthCalculator /> },
+      { id: 'inflation', label: 'Inflation-adjusted', content: <InflationAdjustedGrowthCalculator /> },
       { id: 'emergency', label: 'Emergency fund', content: <EmergencyFundRunwayCalculator /> },
       { id: 'payrise', label: 'Pay rise', content: <PayRiseImpactCalculator /> },
       { id: 'pension', label: 'Pension', content: <PensionContributionImpactCalculator /> },
@@ -70,7 +70,7 @@ export default function App() {
             UK money calculators, <span className="text-neon-cyan">done right</span>
           </h1>
           <p className="mt-3 max-w-2xl text-sm text-white/60">
-            Fast, no-login calculators for UK taxes and savings. Educational estimates only — not financial advice.
+            Fast, no-login calculators for UK taxes and savings. Educational estimates only - not financial advice.
           </p>
         </header>
 
@@ -110,8 +110,7 @@ export default function App() {
               </li>
             </ul>
             <p className="mt-3 text-xs text-white/50">
-              We don’t track you. We don’t store inputs. Double-check results against official calculators/payroll when making
-              decisions.
+              Sources last verified: 6 Feb 2025. We don't track you. We don't store inputs. Double-check results against official calculators/payroll when making decisions.
             </p>
           </section>
 
