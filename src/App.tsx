@@ -1,26 +1,70 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Tabs, type TabItem } from './components/Tabs';
+
+import { CalculatorPicker, Page, PageContainer, Section } from './ui';
 import { CompoundGrowthCalculator } from './pages/CompoundGrowthCalculator';
 import { InflationAdjustedGrowthCalculator } from './pages/InflationAdjustedGrowthCalculator';
 import { EmergencyFundRunwayCalculator } from './pages/EmergencyFundRunwayCalculator';
 import { PayRiseImpactCalculator } from './pages/PayRiseImpactCalculator';
 import { PensionContributionImpactCalculator } from './pages/PensionContributionImpactCalculator';
 import { TakeHomeCalculator } from './pages/TakeHomeCalculator';
+import { SOURCES_LAST_VERIFIED } from './lib/sources';
 
 type ToolId = 'takehome' | 'compound' | 'inflation' | 'emergency' | 'payrise' | 'pension';
 
-function parseToolFromHash(): ToolId | null {
-  const raw = window.location.hash.replace(/^#/, '');
-  if (!raw) return null;
-  const params = new URLSearchParams(raw);
-  const tool = params.get('tool') as ToolId | null;
-  return tool;
+const TOOL_IDS: ToolId[] = ['takehome', 'compound', 'inflation', 'emergency', 'payrise', 'pension'];
+
+function isToolId(v: unknown): v is ToolId {
+  return typeof v === 'string' && (TOOL_IDS as string[]).includes(v);
+}
+
+function parseToolFromLocation(): ToolId | null {
+  const fromQuery = new URLSearchParams(window.location.search).get('tool');
+  if (isToolId(fromQuery)) return fromQuery;
+
+  const rawHash = window.location.hash.replace(/^#/, '');
+  if (!rawHash) return null;
+
+  // Legacy: "#takehome" → treat as tool id.
+  if (!rawHash.includes('=')) {
+    return isToolId(rawHash) ? rawHash : null;
+  }
+
+  const params = new URLSearchParams(rawHash);
+  const tool = params.get('tool');
+  return isToolId(tool) ? tool : null;
 }
 
 function setToolHash(tool: ToolId) {
-  const params = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+  const rawHash = window.location.hash.replace(/^#/, '');
+  const params = rawHash.includes('=') ? new URLSearchParams(rawHash) : new URLSearchParams();
   params.set('tool', tool);
   window.location.hash = params.toString();
+}
+
+function canonicaliseUrl() {
+  const query = new URLSearchParams(window.location.search);
+  const queryTool = query.get('tool');
+  if (!isToolId(queryTool)) return;
+
+  const hashTool = (() => {
+    const rawHash = window.location.hash.replace(/^#/, '');
+    if (!rawHash) return null;
+    if (!rawHash.includes('=')) return isToolId(rawHash) ? rawHash : null;
+    const params = new URLSearchParams(rawHash);
+    const t = params.get('tool');
+    return isToolId(t) ? t : null;
+  })();
+
+  // Canonical: hash routing. If the deep link uses ?tool=..., redirect once to #tool=...
+  if (!hashTool) {
+    setToolHash(queryTool);
+  }
+
+  // Remove query param from the URL (keep hash) so shares are consistent.
+  query.delete('tool');
+  const nextSearch = query.toString();
+  const next = `${window.location.pathname}${nextSearch ? `?${nextSearch}` : ''}${window.location.hash}`;
+  window.history.replaceState({}, '', next);
 }
 
 function formatLastUpdated(iso: string) {
@@ -29,28 +73,53 @@ function formatLastUpdated(iso: string) {
   return d.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: '2-digit' });
 }
 
-const SOURCES_LAST_VERIFIED = '6 Feb 2026';
-
 export default function App() {
-  const items: TabItem<ToolId>[] = useMemo(
+  const tools = useMemo(
     () => [
-      { id: 'takehome', label: 'Take-home', content: <TakeHomeCalculator /> },
-      { id: 'compound', label: 'Compound growth', content: <CompoundGrowthCalculator /> },
-      { id: 'inflation', label: 'Inflation-adjusted', content: <InflationAdjustedGrowthCalculator /> },
-      { id: 'emergency', label: 'Emergency fund', content: <EmergencyFundRunwayCalculator /> },
-      { id: 'payrise', label: 'Pay rise', content: <PayRiseImpactCalculator /> },
-      { id: 'pension', label: 'Pension', content: <PensionContributionImpactCalculator /> },
+      {
+        id: 'takehome' as const,
+        label: 'Take‑home pay',
+        description: 'Estimate income tax + employee NI from a gross annual salary.',
+      },
+      {
+        id: 'payrise' as const,
+        label: 'Pay rise impact',
+        description: 'How much of a gross pay rise you keep after tax + NI.',
+      },
+      {
+        id: 'compound' as const,
+        label: 'Compound growth',
+        description: 'Savings/investing projection with monthly contributions.',
+      },
+      {
+        id: 'inflation' as const,
+        label: 'Inflation‑adjusted growth',
+        description: 'Translate nominal growth into “today’s money”.',
+      },
+      {
+        id: 'emergency' as const,
+        label: 'Emergency fund runway',
+        description: 'How many months your cash could cover essentials.',
+      },
+      {
+        id: 'pension' as const,
+        label: 'Pension contribution impact',
+        description: 'Rough take‑home impact of pension contributions (simplified).',
+      },
     ],
     [],
   );
 
-  const [active, setActive] = useState<ToolId>(() => parseToolFromHash() ?? 'takehome');
+  const [active, setActive] = useState<ToolId>(() => parseToolFromLocation() ?? 'takehome');
 
   useEffect(() => {
+    canonicaliseUrl();
+
     const onHash = () => {
-      const next = parseToolFromHash();
+      const next = parseToolFromLocation();
       if (next) setActive(next);
     };
+
     window.addEventListener('hashchange', onHash);
     return () => window.removeEventListener('hashchange', onHash);
   }, []);
@@ -59,40 +128,65 @@ export default function App() {
     setToolHash(active);
   }, [active]);
 
+  const content = useMemo(() => {
+    switch (active) {
+      case 'takehome':
+        return <TakeHomeCalculator />;
+      case 'compound':
+        return <CompoundGrowthCalculator />;
+      case 'inflation':
+        return <InflationAdjustedGrowthCalculator />;
+      case 'emergency':
+        return <EmergencyFundRunwayCalculator />;
+      case 'payrise':
+        return <PayRiseImpactCalculator />;
+      case 'pension':
+        return <PensionContributionImpactCalculator />;
+      default:
+        return null;
+    }
+  }, [active]);
+
   return (
-    <div className="min-h-full">
-      <div className="mx-auto max-w-5xl px-4 py-10">
-        <header className="mb-6">
+    <Page>
+      <PageContainer className="pt-10">
+        <header className="mb-7">
           <div className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2">
             <span className="h-2 w-2 rounded-full bg-neon-cyan" />
             <span className="text-xs font-semibold tracking-widest text-white/70">MONEY CALCULATORS UK</span>
           </div>
 
-          <h1 className="mt-5 text-4xl font-semibold tracking-tight">
+          <h1 className="mt-5 text-4xl font-semibold tracking-tight text-white/95">
             UK money calculators, <span className="text-neon-cyan">done right</span>
           </h1>
           <p className="mt-3 max-w-2xl text-sm text-white/60">
-            Fast, no-login calculators for UK taxes and savings. Educational estimates only - not financial advice.
+            Fast, no-login calculators for UK taxes and savings. Educational estimates only — not financial advice.
           </p>
         </header>
+      </PageContainer>
 
+      <CalculatorPicker
+        items={tools}
+        activeId={active}
+        onChange={(id) => {
+          setActive(id);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+      />
+
+      <PageContainer className="pb-12 pt-6">
         <main className="space-y-10">
-          <Tabs
-            items={items}
-            activeId={active}
-            onChange={setActive}
-            primaryIds={['takehome', 'compound', 'pension', 'emergency']}
-            maxPrimaryTabs={4}
-          />
+          <div id="calculator" className="scroll-mt-24">
+            {content}
+          </div>
 
-          <section id="method" className="scroll-mt-24 border-t border-white/10 pt-8">
-            <h2 className="text-lg font-semibold">Method &amp; sources</h2>
-            <p className="mt-2 max-w-3xl text-sm text-white/60">
-              These calculators run entirely in your browser (no accounts, no server-side computation). Where a tool uses UK
-              tax thresholds, we link the relevant GOV.UK/HMRC guidance.
-            </p>
-
-            <ul className="mt-3 space-y-2 text-sm text-white/70">
+          <Section
+            id="method"
+            className="scroll-mt-24 border-t border-white/10 pt-8"
+            title="Method & sources"
+            subtitle="These calculators run entirely in your browser (no accounts, no server-side computation). Where a tool uses UK tax thresholds, we link GOV.UK/HMRC guidance."
+          >
+            <ul className="space-y-2 text-sm text-white/70">
               <li>
                 Income Tax rates (GOV.UK):{' '}
                 <a
@@ -139,19 +233,18 @@ export default function App() {
               </li>
             </ul>
 
-            <p className="mt-3 text-xs text-white/50">
-              Sources last verified: {SOURCES_LAST_VERIFIED} (updated when we review sources; not every release). We don't
-              track you. We don't store inputs. Double-check results against official calculators/payroll when making
+            <p className="text-xs text-white/50">
+              Sources last verified: {SOURCES_LAST_VERIFIED} (updated when we review sources; not every release). We don’t
+              track you. We don’t store inputs. Double-check results against official calculators/payroll when making
               decisions.
             </p>
-          </section>
+          </Section>
 
-          <section className="border-t border-white/10 pt-8">
-            <h2 className="text-lg font-semibold">Coming next</h2>
-            <ul className="mt-3 space-y-2 text-sm text-white/70">
+          <Section className="border-t border-white/10 pt-8" title="Coming next">
+            <ul className="space-y-2 text-sm text-white/70">
               <li>More UK calculators, one at a time (with tests + clear assumptions).</li>
             </ul>
-          </section>
+          </Section>
         </main>
 
         <footer className="mt-10 border-t border-white/10 pt-6 text-xs text-white/50">
@@ -165,11 +258,11 @@ export default function App() {
               className="underline decoration-white/20 underline-offset-4 hover:decoration-white/40"
               onClick={() => document.getElementById('method')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
             >
-              Method &amp; sources
+              Method & sources
             </button>
           </div>
         </footer>
-      </div>
-    </div>
+      </PageContainer>
+    </Page>
   );
 }
