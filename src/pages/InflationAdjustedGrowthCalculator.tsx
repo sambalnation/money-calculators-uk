@@ -81,7 +81,7 @@ export function InflationAdjustedGrowthCalculator() {
           </div>
 
           <details className="rounded-xl border border-white/10 bg-bg-900/30 p-4" open>
-            <summary className="cursor-pointer select-none text-sm font-medium text-white/70 outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-900">Value over time (nominal vs real)</summary>
+            <summary className="cursor-pointer select-none text-sm font-medium text-white/70 outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-900">Value over time (nominal vs real)</summary>
             <div className="mt-3">
               <YearlyLineChart
                 years={result.yearly.map((r) => r.year)}
@@ -105,7 +105,7 @@ export function InflationAdjustedGrowthCalculator() {
               />
 
               <details className="mt-4 rounded-xl border border-white/10 bg-bg-900/20 p-3">
-                <summary className="cursor-pointer select-none text-xs font-medium text-white/70 outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-900">Show table</summary>
+                <summary className="cursor-pointer select-none text-xs font-medium text-white/70 outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-900">Show table</summary>
                 <div className="mt-3 overflow-x-auto">
                   <table className="w-full min-w-[520px] text-left text-xs">
                     <thead className="text-white/50">

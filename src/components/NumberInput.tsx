@@ -21,7 +21,7 @@ export function NumberInput({
       <div className="mt-2 flex items-center rounded-xl border border-white/10 bg-bg-900/70 px-3 py-2 transition-colors focus-within:border-neon-cyan/40 focus-within:bg-bg-900/90">
         {prefix ? <span className="mr-2 text-sm text-white/50">{prefix}</span> : null}
         <input
-          className="w-full bg-transparent text-base outline-none placeholder:text-white/20 focus-visible:ring-2 focus-visible:ring-neon-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-900"
+          className="w-full bg-transparent text-base outline-none placeholder:text-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-900"
           inputMode="decimal"
           type="text"
           value={Number.isFinite(value) ? String(value) : ''}
