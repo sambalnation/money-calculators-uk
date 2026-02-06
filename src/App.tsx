@@ -74,10 +74,10 @@ export default function App() {
         <main className="space-y-6">
           <Tabs items={items} activeId={active} onChange={setActive} />
 
-          <section className="rounded-2xl border border-white/10 bg-white/5 p-5">
+          <section className="rounded-2xl border border-white/10 bg-bg-900 p-5">
             <h2 className="text-lg font-semibold">Coming next</h2>
             <ul className="mt-3 grid gap-2 text-sm text-white/70 md:grid-cols-2">
-              <li className="rounded-xl border border-white/10 bg-bg-900/40 p-3">More UK calculators, one at a time (with tests + clear assumptions)</li>
+              <li className="rounded-xl border border-white/10 bg-bg-950/60 p-3">More UK calculators, one at a time (with tests + clear assumptions)</li>
             </ul>
           </section>
         </main>
