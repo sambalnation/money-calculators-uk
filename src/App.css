@@ -1,3 +1,9 @@
+/* Global focus state baseline for accessibility */
+*:focus-visible {
+  outline: 2px solid rgb(34 211 238 / 0.6); /* neon-cyan/60 */
+  outline-offset: 2px;
+}
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
