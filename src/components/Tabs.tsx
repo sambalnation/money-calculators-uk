@@ -142,14 +142,14 @@ export function Tabs<T extends string>({
 
   return (
     <div>
-      {/* Sticky tab header (styled like a lightweight strip; tool content renders on the page background). */}
+      {/* Sticky tab header (flat strip with divider; active tab uses underline). */}
       <div className="sticky top-0 z-20">
-        <div className="rounded-2xl border border-white/10 bg-bg-900/90 px-4 pt-3 shadow-neon backdrop-blur">
-          <div className="relative flex items-end gap-2">
+        <div className="border-b border-white/10 bg-bg-950/70 backdrop-blur">
+          <div className="relative flex items-end gap-2 px-4">
             <div
               role="tablist"
               aria-label={ariaLabel}
-              className="no-scrollbar flex flex-1 flex-nowrap gap-1 overflow-x-auto pb-1"
+              className="no-scrollbar flex flex-1 flex-nowrap gap-5 overflow-x-auto"
               onKeyDown={(e) => {
                 // Roving tabs + automatic activation
                 if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
@@ -191,38 +191,32 @@ export function Tabs<T extends string>({
                     aria-controls={panelDomId(t.id)}
                     onClick={() => onChange(t.id)}
                     className={
-                      'relative -mb-px shrink-0 whitespace-nowrap rounded-t-xl border px-4 py-2 text-xs font-semibold tracking-wide transition ' +
-                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/50 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-900 ' +
+                      'relative -mb-px shrink-0 whitespace-nowrap border-b-2 px-1.5 py-3 text-xs font-semibold tracking-wide transition ' +
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/50 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-950 ' +
                       (active
-                        ? 'border-white/20 border-b-0 bg-bg-900 text-white shadow-neon'
-                        : 'border-transparent bg-transparent text-white/60 hover:border-white/10 hover:bg-white/5 hover:text-white/85')
+                        ? 'border-neon-cyan/80 text-white'
+                        : 'border-transparent text-white/60 hover:border-white/20 hover:text-white/85')
                     }
                   >
                     {t.label}
-                    {active ? (
-                      <span
-                        aria-hidden="true"
-                        className="pointer-events-none absolute left-3 right-3 bottom-0 h-px bg-neon-cyan/70"
-                      />
-                    ) : null}
                   </button>
                 );
               })}
             </div>
 
             {showMore ? (
-              <div ref={menuRootRef} className="relative pb-1">
+              <div ref={menuRootRef} className="relative">
                 <button
                   ref={menuButtonRef}
                   type="button"
                   aria-haspopup="menu"
                   aria-expanded={menuOpen}
                   className={
-                    'relative -mb-px inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-t-xl border px-3 py-2 text-xs font-semibold tracking-wide transition ' +
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/50 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-900 ' +
+                    'relative -mb-px inline-flex shrink-0 items-center gap-2 whitespace-nowrap border-b-2 px-1.5 py-3 text-xs font-semibold tracking-wide transition ' +
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/50 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-950 ' +
                     (menuOpen
-                      ? 'border-white/20 border-b-0 bg-bg-900 text-white'
-                      : 'border-transparent bg-transparent text-white/60 hover:border-white/10 hover:bg-white/5 hover:text-white/85')
+                      ? 'border-neon-cyan/70 text-white'
+                      : 'border-transparent text-white/60 hover:border-white/20 hover:text-white/85')
                   }
                   onClick={() => setMenuOpen((v) => !v)}
                   onKeyDown={(e) => {
@@ -316,14 +310,13 @@ export function Tabs<T extends string>({
             {/* Subtle fade edges to hint horizontal scrolling on mobile */}
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute left-0 top-0 h-full w-6 bg-gradient-to-r from-bg-900/90 to-transparent"
+              className="pointer-events-none absolute left-0 top-0 h-full w-6 bg-gradient-to-r from-bg-950/70 to-transparent"
             />
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute right-0 top-0 h-full w-10 bg-gradient-to-l from-bg-900/90 to-transparent"
+              className="pointer-events-none absolute right-0 top-0 h-full w-10 bg-gradient-to-l from-bg-950/70 to-transparent"
             />
           </div>
-
         </div>
       </div>
 
