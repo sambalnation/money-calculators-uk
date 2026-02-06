@@ -77,7 +77,7 @@ export function CompoundGrowthCalculator() {
                 </p>
               </div>
               <select
-                className="rounded-xl border border-white/10 bg-bg-900/70 px-3 py-2 text-sm text-white/80 outline-none"
+                className="rounded-xl border border-white/10 bg-bg-900/70 px-3 py-2 text-sm text-white/80 outline-none transition-colors focus-visible:border-neon-cyan/60 focus-visible:ring-2 focus-visible:ring-neon-cyan/60"
                 value={contributionTiming}
                 onChange={(e) => setContributionTiming(e.target.value as ContributionTiming)}
               >
