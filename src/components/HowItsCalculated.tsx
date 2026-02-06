@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
-const SOURCES_LAST_VERIFIED = '6 Feb 2026';
+import { Disclosure } from '../ui';
+import { SOURCES_LAST_VERIFIED } from '../lib/sources';
 
 export type SourceLink = {
   label: string;
@@ -8,7 +9,7 @@ export type SourceLink = {
 };
 
 export function HowItsCalculated({
-  title = "How it’s calculated",
+  title = 'How it’s calculated',
   bullets,
   sources,
   children,
@@ -19,43 +20,37 @@ export function HowItsCalculated({
   children?: ReactNode;
 }) {
   return (
-    <details className="border-t border-white/10 pt-4">
-      <summary className="cursor-pointer select-none text-sm font-semibold text-white/75 outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/50 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-950">
-        {title}
-      </summary>
+    <Disclosure title={title}>
+      {bullets && bullets.length > 0 ? (
+        <ul className="list-disc space-y-1 pl-5">
+          {bullets.map((b) => (
+            <li key={b}>{b}</li>
+          ))}
+        </ul>
+      ) : null}
 
-      <div className="mt-3 space-y-3 text-sm text-white/65">
-        {bullets && bullets.length > 0 ? (
-          <ul className="list-disc space-y-1 pl-5">
-            {bullets.map((b) => (
-              <li key={b}>{b}</li>
+      {children}
+
+      {sources && sources.length > 0 ? (
+        <div className="border-t border-white/10 pt-3">
+          <p className="text-xs font-semibold tracking-widest text-white/50">SOURCES</p>
+          <ul className="mt-2 space-y-1 text-xs">
+            {sources.map((s) => (
+              <li key={s.href}>
+                <a
+                  className="underline decoration-white/20 underline-offset-4 hover:decoration-white/40"
+                  href={s.href}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {s.label}
+                </a>
+              </li>
             ))}
           </ul>
-        ) : null}
-
-        {children}
-
-        {sources && sources.length > 0 ? (
-          <div className="border-t border-white/10 pt-3">
-            <p className="text-xs font-semibold tracking-widest text-white/50">SOURCES</p>
-            <ul className="mt-2 space-y-1 text-xs">
-              {sources.map((s) => (
-                <li key={s.href}>
-                  <a
-                    className="underline decoration-white/20 underline-offset-4 hover:decoration-white/40"
-                    href={s.href}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {s.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-            <p className="mt-2 text-xs text-white/40">Sources last verified: {SOURCES_LAST_VERIFIED}</p>
-          </div>
-        ) : null}
-      </div>
-    </details>
+          <p className="mt-2 text-xs text-white/40">Sources last verified: {SOURCES_LAST_VERIFIED}</p>
+        </div>
+      ) : null}
+    </Disclosure>
   );
 }
