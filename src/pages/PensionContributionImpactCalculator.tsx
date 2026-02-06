@@ -182,7 +182,7 @@ export function PensionContributionImpactCalculator() {
               <div className="mt-3 grid gap-2">
                 {shownScenarios.map((k) => (
                   <details key={k} className="rounded-xl border border-white/10 bg-bg-900/30 p-3">
-                    <summary className="cursor-pointer select-none text-xs font-medium text-white/70">
+                    <summary className="cursor-pointer select-none text-xs font-medium text-white/70 outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-900">
                       {result.scenarios[k].label} — notes
                     </summary>
                     <ul className="mt-2 list-disc space-y-1 pl-4 text-xs text-white/60">

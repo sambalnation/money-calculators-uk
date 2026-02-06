@@ -65,7 +65,7 @@ export function PayRiseImpactCalculator() {
           </div>
 
           <details className="rounded-xl border border-white/10 bg-bg-900/30 p-4">
-            <summary className="cursor-pointer select-none text-sm font-medium text-white/70">Before vs after (take-home)</summary>
+            <summary className="cursor-pointer select-none text-sm font-medium text-white/70 outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-900">Before vs after (take-home)</summary>
             <div className="mt-3 grid gap-3 text-sm">
               <div className="rounded-xl border border-white/10 bg-bg-900/40 p-4">
                 <p className="text-xs font-semibold tracking-widest text-white/50">CURRENT</p>
