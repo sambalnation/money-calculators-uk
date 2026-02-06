@@ -77,7 +77,13 @@ export default function App() {
         </header>
 
         <main className="space-y-6">
-          <Tabs items={items} activeId={active} onChange={setActive} />
+          <Tabs
+            items={items}
+            activeId={active}
+            onChange={setActive}
+            primaryIds={['takehome', 'compound', 'pension', 'emergency']}
+            maxPrimaryTabs={4}
+          />
 
           <section id="method" className="scroll-mt-24 rounded-2xl border border-white/10 bg-bg-900 p-5">
             <h2 className="text-lg font-semibold">Method &amp; sources</h2>
