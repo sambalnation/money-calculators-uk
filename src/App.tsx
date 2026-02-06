@@ -23,6 +23,12 @@ function setToolHash(tool: ToolId) {
   window.location.hash = params.toString();
 }
 
+function formatLastUpdated(iso: string) {
+  const d = new Date(iso);
+  if (!Number.isFinite(d.getTime())) return iso;
+  return d.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: '2-digit' });
+}
+
 export default function App() {
   const items: TabItem<ToolId>[] = useMemo(
     () => [
@@ -61,10 +67,7 @@ export default function App() {
           </div>
 
           <h1 className="mt-5 text-4xl font-semibold tracking-tight">
-            UK money calculators,
-            <span className="bg-gradient-to-r from-neon-cyan via-neon-pink to-neon-lime bg-clip-text text-transparent">
-              {' '}done right
-            </span>
+            UK money calculators, <span className="text-neon-cyan">done right</span>
           </h1>
           <p className="mt-3 max-w-2xl text-sm text-white/60">
             Fast, no-login calculators for UK taxes and savings. Educational estimates only — not financial advice.
@@ -74,6 +77,44 @@ export default function App() {
         <main className="space-y-6">
           <Tabs items={items} activeId={active} onChange={setActive} />
 
+          <section id="method" className="scroll-mt-24 rounded-2xl border border-white/10 bg-bg-900 p-5">
+            <h2 className="text-lg font-semibold">Method &amp; sources</h2>
+            <p className="mt-2 max-w-3xl text-sm text-white/60">
+              These calculators run entirely in your browser (no accounts, no server-side computation). Where a tool uses UK tax
+              thresholds, we link the relevant GOV.UK/HMRC guidance.
+            </p>
+            <ul className="mt-3 grid gap-2 text-sm text-white/70 md:grid-cols-2">
+              <li className="rounded-xl border border-white/10 bg-bg-950/60 p-3">
+                Income Tax rates (GOV.UK):{' '}
+                <a className="underline decoration-white/20 underline-offset-4 hover:decoration-white/40" href="https://www.gov.uk/income-tax-rates" target="_blank" rel="noreferrer">
+                  gov.uk/income-tax-rates
+                </a>
+              </li>
+              <li className="rounded-xl border border-white/10 bg-bg-950/60 p-3">
+                National Insurance rates (GOV.UK):{' '}
+                <a className="underline decoration-white/20 underline-offset-4 hover:decoration-white/40" href="https://www.gov.uk/national-insurance-rates-letters" target="_blank" rel="noreferrer">
+                  gov.uk/national-insurance-rates-letters
+                </a>
+              </li>
+              <li className="rounded-xl border border-white/10 bg-bg-950/60 p-3">
+                Pension tax relief (GOV.UK):{' '}
+                <a className="underline decoration-white/20 underline-offset-4 hover:decoration-white/40" href="https://www.gov.uk/tax-on-your-private-pension/pension-tax-relief" target="_blank" rel="noreferrer">
+                  gov.uk/.../pension-tax-relief
+                </a>
+              </li>
+              <li className="rounded-xl border border-white/10 bg-bg-950/60 p-3">
+                UK inflation statistics (ONS):{' '}
+                <a className="underline decoration-white/20 underline-offset-4 hover:decoration-white/40" href="https://www.ons.gov.uk/economy/inflationandpriceindices" target="_blank" rel="noreferrer">
+                  ons.gov.uk/.../inflationandpriceindices
+                </a>
+              </li>
+            </ul>
+            <p className="mt-3 text-xs text-white/50">
+              We don’t track you. We don’t store inputs. Double-check results against official calculators/payroll when making
+              decisions.
+            </p>
+          </section>
+
           <section className="rounded-2xl border border-white/10 bg-bg-900 p-5">
             <h2 className="text-lg font-semibold">Coming next</h2>
             <ul className="mt-3 grid gap-2 text-sm text-white/70 md:grid-cols-2">
@@ -82,8 +123,20 @@ export default function App() {
           </section>
         </main>
 
-        <footer className="mt-10 border-t border-white/10 pt-6 text-xs text-white/40">
-          Built for the UK. Dark mode by default. No tracking in this prototype.
+        <footer className="mt-10 border-t border-white/10 pt-6 text-xs text-white/50">
+          <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+            <p>No tracking. No login. Runs in-browser.</p>
+            <p>Last updated: {formatLastUpdated(__BUILD_TIME__)}</p>
+          </div>
+          <div className="mt-2">
+            <button
+              type="button"
+              className="underline decoration-white/20 underline-offset-4 hover:decoration-white/40"
+              onClick={() => document.getElementById('method')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+            >
+              Method &amp; sources
+            </button>
+          </div>
         </footer>
       </div>
     </div>

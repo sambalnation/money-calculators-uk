@@ -11,15 +11,18 @@ export default {
           950: '#05060a',
           900: '#070812',
         },
+        // Kept for backwards-compatibility with existing classes, but toned down
+        // to feel more "finance tool" than "neon".
         neon: {
-          cyan: '#26f6ff',
-          pink: '#ff2bd6',
-          lime: '#a7ff1f',
-          purple: '#8a5bff',
+          cyan: '#22d3ee', // cyan-400
+          pink: '#f472b6', // pink-400
+          lime: '#a3e635', // lime-400
+          purple: '#a78bfa', // violet-400
         },
       },
       boxShadow: {
-        neon: '0 0 0 1px rgba(38,246,255,0.25), 0 0 32px rgba(38,246,255,0.18)',
+        // Subtle accent ring + depth (replaces heavy glow).
+        neon: '0 0 0 1px rgba(34,211,238,0.16), 0 14px 34px rgba(0,0,0,0.55)',
       },
     },
   },

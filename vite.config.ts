@@ -8,6 +8,9 @@ export default defineConfig({
   // Without a base path, asset URLs resolve from / and you get a white page.
   base: process.env.PUBLIC_BASE_PATH ?? '/money-calculators-uk/',
   plugins: [react()],
+  define: {
+    __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+  },
   test: {
     globals: true,
     environment: 'jsdom',

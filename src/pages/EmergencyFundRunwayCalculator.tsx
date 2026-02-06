@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Card } from '../components/Card';
+import { HowItsCalculated } from '../components/HowItsCalculated';
 import { NumberInput } from '../components/NumberInput';
 import { computeEmergencyFundRunway } from '../lib/emergencyFundRunway';
 
@@ -95,6 +96,16 @@ export function EmergencyFundRunwayCalculator() {
           )}
         </div>
       </Card>
+
+      <div className="lg:col-span-2">
+        <HowItsCalculated
+          bullets={[
+            'Net monthly burn is calculated as essential spending minus income during the emergency.',
+            'Runway (months) is emergency fund balance divided by net monthly burn (∞ if burn is zero or below).',
+            'Runway (weeks) converts months to weeks using 52/12.',
+          ]}
+        />
+      </div>
     </div>
   );
 }

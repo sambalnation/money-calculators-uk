@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Card } from '../components/Card';
+import { HowItsCalculated } from '../components/HowItsCalculated';
 import { NumberInput } from '../components/NumberInput';
 import { computePensionContributionImpact, type PensionSchemeType } from '../lib/pensionContributionImpact';
 import { DEFAULT_UK_ASSUMPTIONS } from '../lib/ukTax';
@@ -197,6 +198,21 @@ export function PensionContributionImpactCalculator() {
           )}
         </div>
       </Card>
+
+      <div className="lg:col-span-2">
+        <HowItsCalculated
+          bullets={[
+            'We start with a baseline take-home estimate (income tax + employee NI) using the current tax year assumptions.',
+            'Each pension scheme type changes taxable pay differently (e.g. salary sacrifice reduces gross pay; relief-at-source applies relief to your contribution).',
+            'This tool is simplified: it does not include student loans, benefits, childcare, or claiming extra higher-rate relief.',
+          ]}
+          sources={[
+            { label: 'GOV.UK — Pension tax relief', href: 'https://www.gov.uk/tax-on-your-private-pension/pension-tax-relief' },
+            { label: 'GOV.UK — Income Tax rates', href: 'https://www.gov.uk/income-tax-rates' },
+            { label: 'GOV.UK — National Insurance rates', href: 'https://www.gov.uk/national-insurance-rates-letters' },
+          ]}
+        />
+      </div>
     </div>
   );
 }

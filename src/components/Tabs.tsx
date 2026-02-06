@@ -1,4 +1,4 @@
-import { type ReactNode, useMemo, useRef } from 'react';
+import { type ReactNode, useEffect, useMemo, useRef } from 'react';
 
 export type TabItem<T extends string> = {
   id: T;
@@ -35,78 +35,96 @@ export function Tabs<T extends string>({
 
   const activeIndex = indexById.get(activeId) ?? 0;
 
+  useEffect(() => {
+    // Keep the active tab visible when the tablist is horizontally scrollable (mobile).
+    const el = tabRefs.current[activeIndex];
+    el?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  }, [activeIndex]);
+
   return (
     <div>
       {/* Tab bar */}
       <div className="sticky top-0 z-10 -mx-4 mb-6 border-b border-white/10 bg-bg-950/90 px-4 pt-3 backdrop-blur">
-        <div
-          role="tablist"
-          aria-label={ariaLabel}
-          className="flex flex-wrap gap-1"
-          onKeyDown={(e) => {
-            // Roving tabs + automatic activation
-            if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
-            e.preventDefault();
+        <div className="relative">
+          <div
+            role="tablist"
+            aria-label={ariaLabel}
+            className="no-scrollbar flex flex-nowrap gap-1 overflow-x-auto pb-1"
+            onKeyDown={(e) => {
+              // Roving tabs + automatic activation
+              if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
+              e.preventDefault();
 
-            const count = items.length;
-            if (count === 0) return;
+              const count = items.length;
+              if (count === 0) return;
 
-            const current = activeIndex;
-            const next =
-              e.key === 'Home'
-                ? 0
-                : e.key === 'End'
-                  ? count - 1
-                  : e.key === 'ArrowLeft'
-                    ? (current - 1 + count) % count
-                    : (current + 1) % count;
+              const current = activeIndex;
+              const next =
+                e.key === 'Home'
+                  ? 0
+                  : e.key === 'End'
+                    ? count - 1
+                    : e.key === 'ArrowLeft'
+                      ? (current - 1 + count) % count
+                      : (current + 1) % count;
 
-            const nextId = items[next]?.id;
-            if (!nextId) return;
+              const nextId = items[next]?.id;
+              if (!nextId) return;
 
-            tabRefs.current[next]?.focus();
-            onChange(nextId);
-          }}
-        >
-          {items.map((t, i) => {
-            const active = t.id === activeId;
-            return (
-              <button
-                key={t.id}
-                ref={(el) => {
-                  tabRefs.current[i] = el;
-                }}
-                id={tabDomId(t.id)}
-                role="tab"
-                type="button"
-                tabIndex={active ? 0 : -1}
-                aria-selected={active}
-                aria-controls={panelDomId(t.id)}
-                onClick={() => onChange(t.id)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    onChange(t.id);
+              tabRefs.current[next]?.focus();
+              onChange(nextId);
+            }}
+          >
+            {items.map((t, i) => {
+              const active = t.id === activeId;
+              return (
+                <button
+                  key={t.id}
+                  ref={(el) => {
+                    tabRefs.current[i] = el;
+                  }}
+                  id={tabDomId(t.id)}
+                  role="tab"
+                  type="button"
+                  tabIndex={active ? 0 : -1}
+                  aria-selected={active}
+                  aria-controls={panelDomId(t.id)}
+                  onClick={() => onChange(t.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      onChange(t.id);
+                    }
+                  }}
+                  className={
+                    'relative -mb-px shrink-0 whitespace-nowrap rounded-t-xl border px-4 py-2 text-xs font-semibold tracking-wide transition ' +
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/50 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-900 ' +
+                    (active
+                      ? 'border-white/20 bg-bg-900 text-white shadow-neon'
+                      : 'border-transparent bg-transparent text-white/60 hover:border-white/10 hover:bg-white/5 hover:text-white/85')
                   }
-                }}
-                className={
-                  'relative -mb-px rounded-t-xl border px-4 py-2 text-xs font-semibold tracking-wide transition ' +
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-900 ' +
-                  (active
-                    ? 'border-white/20 bg-bg-900 text-white shadow-neon'
-                    : 'border-transparent bg-transparent text-white/60 hover:border-white/10 hover:bg-white/5 hover:text-white/85')
-                }
-              >
-                {t.label}
-                {active ? (
-                  <span
-                    aria-hidden="true"
-                    className="pointer-events-none absolute left-3 right-3 bottom-0 h-px bg-gradient-to-r from-neon-cyan via-neon-pink to-neon-lime"
-                  />
-                ) : null}
-              </button>
-            );
-          })}
+                >
+                  {t.label}
+                  {active ? (
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute left-3 right-3 bottom-0 h-px bg-neon-cyan/70"
+                    />
+                  ) : null}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Subtle fade edges to hint horizontal scrolling on mobile */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute left-0 top-0 h-full w-6 bg-gradient-to-r from-bg-950/90 to-transparent"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute right-0 top-0 h-full w-10 bg-gradient-to-l from-bg-950/90 to-transparent"
+          />
         </div>
       </div>
 

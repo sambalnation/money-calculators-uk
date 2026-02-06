@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Card } from '../components/Card';
+import { HowItsCalculated } from '../components/HowItsCalculated';
 import { NumberInput } from '../components/NumberInput';
 import { computeTakeHome, DEFAULT_UK_ASSUMPTIONS } from '../lib/ukTax';
 
@@ -58,6 +59,21 @@ export function TakeHomeCalculator() {
           </div>
         </div>
       </Card>
+
+      <div className="lg:col-span-2">
+        <HowItsCalculated
+          bullets={[
+            'Taxable pay is calculated as gross annual salary minus the personal allowance (simplified: no allowance tapering).',
+            'Income tax is calculated by applying the basic/higher/additional rates to the relevant taxable bands.',
+            'Employee Class 1 National Insurance is calculated from annualised thresholds (simplified model).',
+            'Excludes pension contributions, student loans, benefits, childcare, salary sacrifice and other payslip items.',
+          ]}
+          sources={[
+            { label: 'GOV.UK — Income Tax rates', href: 'https://www.gov.uk/income-tax-rates' },
+            { label: 'GOV.UK — National Insurance rates', href: 'https://www.gov.uk/national-insurance-rates-letters' },
+          ]}
+        />
+      </div>
     </div>
   );
 }

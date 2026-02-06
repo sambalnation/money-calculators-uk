@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Card } from '../components/Card';
+import { HowItsCalculated } from '../components/HowItsCalculated';
 import { NumberInput } from '../components/NumberInput';
 import { YearlyLineChart } from '../components/YearlyLineChart';
 import { computeCompoundGrowth, type ContributionTiming } from '../lib/compoundGrowth';
@@ -171,6 +172,16 @@ export function CompoundGrowthCalculator() {
           </details>
         </div>
       </Card>
+
+      <div className="lg:col-span-2">
+        <HowItsCalculated
+          bullets={[
+            'We convert the annual growth rate into a monthly rate by dividing by 12 (simple, constant-rate model).',
+            'Each month: apply growth, apply the fee (annual fee spread evenly across months), then add your contribution (timing selectable).',
+            'Total growth is final balance minus starting balance minus total contributions.',
+          ]}
+        />
+      </div>
     </div>
   );
 }

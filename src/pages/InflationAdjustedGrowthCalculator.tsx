@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Card } from '../components/Card';
+import { HowItsCalculated } from '../components/HowItsCalculated';
 import { NumberInput } from '../components/NumberInput';
 import { YearlyLineChart } from '../components/YearlyLineChart';
 import { computeInflationAdjustedGrowth } from '../lib/inflationAdjustedGrowth';
@@ -133,6 +134,19 @@ export function InflationAdjustedGrowthCalculator() {
           </details>
         </div>
       </Card>
+
+      <div className="lg:col-span-2">
+        <HowItsCalculated
+          bullets={[
+            'We compound the balance monthly using the nominal annual return divided by 12 (constant-rate model).',
+            'Each month: grow the balance, then add the end-of-month contribution.',
+            '“Real” (today’s £) values are calculated by deflating the nominal balance by cumulative inflation.',
+          ]}
+          sources={[
+            { label: 'ONS — Inflation and price indices (background)', href: 'https://www.ons.gov.uk/economy/inflationandpriceindices' },
+          ]}
+        />
+      </div>
     </div>
   );
 }

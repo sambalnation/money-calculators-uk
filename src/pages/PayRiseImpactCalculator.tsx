@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Card } from '../components/Card';
+import { HowItsCalculated } from '../components/HowItsCalculated';
 import { NumberInput } from '../components/NumberInput';
 import { computePayRiseImpact } from '../lib/payRiseImpact';
 import { DEFAULT_UK_ASSUMPTIONS } from '../lib/ukTax';
@@ -88,6 +89,20 @@ export function PayRiseImpactCalculator() {
           </details>
         </div>
       </Card>
+
+      <div className="lg:col-span-2">
+        <HowItsCalculated
+          bullets={[
+            'We compute take-home for the current salary and the new salary using the same simplified UK tax/NI assumptions.',
+            'Net change is the difference between the two take-home results (annual and monthly).',
+            '“You keep” is net change divided by gross change (effective marginal keep rate for that specific pay rise).',
+          ]}
+          sources={[
+            { label: 'GOV.UK — Income Tax rates', href: 'https://www.gov.uk/income-tax-rates' },
+            { label: 'GOV.UK — National Insurance rates', href: 'https://www.gov.uk/national-insurance-rates-letters' },
+          ]}
+        />
+      </div>
     </div>
   );
 }
