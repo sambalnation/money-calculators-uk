@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react';
-import { Card } from '../components/Card';
+
 import { HowItsCalculated } from '../components/HowItsCalculated';
-import { NumberInput } from '../components/NumberInput';
 import { YearlyLineChart } from '../components/YearlyLineChart';
 import { computeCompoundGrowth, type ContributionTiming } from '../lib/compoundGrowth';
+import { Disclosure, KeyValueList, NumberField, Panel, SelectField, chartTokens } from '../ui';
 
 function fmtGBP(n: number) {
   return new Intl.NumberFormat('en-GB', {
@@ -44,91 +44,70 @@ export function CompoundGrowthCalculator() {
   );
 
   return (
-    <div className="grid gap-5 lg:grid-cols-2">
-      <Card title="Compound growth" subtitle="Savings / investing growth estimate with monthly contributions.">
+    <div className="grid gap-6 lg:grid-cols-2">
+      <Panel title="Compound growth" subtitle="Savings/investing estimate with monthly contributions.">
         <div className="grid gap-4">
-          <NumberInput label="Starting balance" prefix="£" value={startingBalance} onChange={setStartingBalance} />
-          <NumberInput
+          <NumberField label="Starting balance" prefix="£" value={startingBalance} onChange={setStartingBalance} />
+          <NumberField
             label="Monthly contribution"
             prefix="£"
             value={monthlyContribution}
             onChange={setMonthlyContribution}
             hint="per month"
           />
-          <NumberInput
+          <NumberField
             label="Annual growth rate (nominal)"
             value={annualRatePct}
             onChange={setAnnualRatePct}
             hint="% per year"
           />
-          <NumberInput
-            label="Annual fee (platform/fund)"
-            value={annualFeePct}
-            onChange={setAnnualFeePct}
-            hint="% per year"
+          <NumberField label="Annual fee (platform/fund)" value={annualFeePct} onChange={setAnnualFeePct} hint="% per year" />
+          <NumberField label="Time horizon" value={years} onChange={setYears} hint="years" inputMode="numeric" />
+
+          <SelectField
+            label="Contribution timing"
+            hint="small difference, but start-of-month usually wins"
+            value={contributionTiming}
+            onChange={setContributionTiming}
+            options={[
+              { value: 'endOfPeriod', label: 'End of month' },
+              { value: 'startOfPeriod', label: 'Start of month' },
+            ]}
           />
-          <NumberInput label="Time horizon" value={years} onChange={setYears} hint="years" />
 
-          <div className="border-t border-white/10 pt-4">
-            <div className="flex flex-wrap items-end justify-between gap-3">
-              <div>
-                <p className="text-sm font-medium text-white/80">Contribution timing</p>
-                <p className="mt-1 text-xs text-white/50">
-                  Investing at the start of the month usually gives a tiny boost vs end-of-month saving.
-                </p>
-              </div>
-              <select
-                className="rounded-xl border border-white/10 bg-bg-900/70 px-3 py-2 text-sm text-white/80 outline-none transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-950"
-                value={contributionTiming}
-                onChange={(e) => setContributionTiming(e.target.value as ContributionTiming)}
-              >
-                <option value="endOfPeriod">End of month</option>
-                <option value="startOfPeriod">Start of month</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="border-t border-white/10 pt-4 text-xs text-white/60">
-            <p className="font-medium text-white/70">Assumptions (read me)</p>
-            <ul className="mt-2 list-disc space-y-1 pl-4">
+          <Disclosure title="Assumptions" defaultOpen>
+            <ul className="list-disc space-y-1 pl-5 text-xs">
               <li>Constant annual growth rate ({fmtPct(result.inputs.annualRatePct)}) with monthly compounding.</li>
               <li>
                 Simple fee model: an annual fee of {fmtPct(result.inputs.annualFeePct)} is charged evenly each month as a %
-                of your current balance.
+                of your balance.
               </li>
               <li>
-                Contributions are applied: <span className="text-white/70">{timingLabel(contributionTiming)}</span>.
+                Contributions are applied: <span className="text-white/75">{timingLabel(contributionTiming)}</span>.
               </li>
               <li>Ignores taxes, inflation, and volatility (real investing is messier).</li>
             </ul>
-            <p className="mt-3">
-              Educational estimates only — not financial advice. For ISA/pension/tax specifics, your result will differ.
-            </p>
-          </div>
+            <p className="text-xs text-white/55">Educational estimates only — not financial advice.</p>
+          </Disclosure>
         </div>
-      </Card>
+      </Panel>
 
-      <Card title="Results">
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-white/70">Final balance (est.)</span>
-            <span className="text-2xl font-semibold text-neon-cyan">{fmtGBP(result.finalBalance)}</span>
+      <Panel title="Results">
+        <div className="space-y-4">
+          <div className="flex items-baseline justify-between gap-6">
+            <span className="text-sm text-white/65">Final balance (est.)</span>
+            <span className="text-2xl font-semibold text-neon-cyan tabular-nums">{fmtGBP(result.finalBalance)}</span>
           </div>
 
-          <div className="divide-y divide-white/10 border-y border-white/10">
-            <div className="py-2">
-              <Row label="Total contributed" value={fmtGBP(result.totalContributed)} accent="text-neon-lime" />
-            </div>
-            <div className="py-2">
-              <Row label="Total growth" value={fmtGBP(result.totalGrowth)} accent="text-neon-pink" />
-            </div>
-          </div>
+          <KeyValueList
+            items={[
+              { label: 'Total contributed', value: fmtGBP(result.totalContributed) },
+              { label: 'Total growth', value: fmtGBP(result.totalGrowth) },
+            ]}
+          />
 
-          <details className="border-t border-white/10 pt-4" open>
-            <summary className="cursor-pointer select-none text-sm font-medium text-white/70 outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-950">
-              Balance over time
-            </summary>
-            <div className="mt-3">
+          <Disclosure title="Balance over time" defaultOpen>
+            <div>
               <YearlyLineChart
                 years={result.yearly.map((r) => r.year)}
                 valueFormatter={fmtGBP}
@@ -136,25 +115,22 @@ export function CompoundGrowthCalculator() {
                   {
                     label: 'End balance',
                     values: result.yearly.map((r) => r.endBalance),
-                    borderColor: 'rgba(34, 211, 238, 0.95)',
-                    backgroundColor: 'rgba(34, 211, 238, 0.15)',
+                    borderColor: chartTokens.accentLine,
+                    backgroundColor: chartTokens.accentFill,
                     fill: true,
                   },
                   {
                     label: 'Total contributed',
                     values: result.yearly.map((r) => r.totalContributed),
-                    borderColor: 'rgba(163, 230, 53, 0.95)',
-                    backgroundColor: 'rgba(163, 230, 53, 0.12)',
+                    borderColor: chartTokens.neutralLine,
+                    backgroundColor: chartTokens.neutralFill,
                     fill: false,
                   },
                 ]}
               />
 
-              <details className="mt-4 border-t border-white/10 pt-3">
-                <summary className="cursor-pointer select-none text-xs font-medium text-white/70 outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-950">
-                  Show table
-                </summary>
-                <div className="mt-3 overflow-x-auto">
+              <Disclosure title="Show table">
+                <div className="overflow-x-auto">
                   <table className="w-full min-w-[420px] text-left text-xs">
                     <thead className="text-white/50">
                       <tr>
@@ -168,7 +144,7 @@ export function CompoundGrowthCalculator() {
                       {result.yearly.map((row) => (
                         <tr key={row.year} className="border-t border-white/10">
                           <td className="py-2">{row.year}</td>
-                          <td className="py-2 font-medium text-white/85">{fmtGBP(row.endBalance)}</td>
+                          <td className="py-2 font-medium text-white/90">{fmtGBP(row.endBalance)}</td>
                           <td className="py-2 text-white/70">{fmtGBP(row.totalContributed)}</td>
                           <td className="py-2 text-white/70">{fmtGBP(row.totalGrowth)}</td>
                         </tr>
@@ -176,13 +152,13 @@ export function CompoundGrowthCalculator() {
                     </tbody>
                   </table>
                 </div>
-              </details>
+              </Disclosure>
             </div>
-          </details>
+          </Disclosure>
         </div>
-      </Card>
+      </Panel>
 
-      <div className="lg:col-span-2 pt-2">
+      <div className="lg:col-span-2 pt-1">
         <HowItsCalculated
           bullets={[
             'We convert the annual growth rate into a monthly rate by dividing by 12 (simple, constant-rate model).',
@@ -191,15 +167,6 @@ export function CompoundGrowthCalculator() {
           ]}
         />
       </div>
-    </div>
-  );
-}
-
-function Row({ label, value, accent }: { label: string; value: string; accent?: string }) {
-  return (
-    <div className="flex items-center justify-between gap-6">
-      <span className="text-sm text-white/60">{label}</span>
-      <span className={`text-sm font-medium ${accent || 'text-white/85'}`}>{value}</span>
     </div>
   );
 }

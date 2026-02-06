@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react';
-import { Card } from '../components/Card';
+
 import { HowItsCalculated } from '../components/HowItsCalculated';
-import { NumberInput } from '../components/NumberInput';
 import { computePensionContributionImpact, type PensionSchemeType } from '../lib/pensionContributionImpact';
 import { DEFAULT_UK_ASSUMPTIONS } from '../lib/ukTax';
+import { Disclosure, KeyValueList, NumberField, Panel, SelectField } from '../ui';
 
 function fmtGBP(n: number) {
   return new Intl.NumberFormat('en-GB', {
@@ -57,119 +57,102 @@ export function PensionContributionImpactCalculator() {
     schemeMode === 'notSure' ? ['salarySacrifice', 'netPay', 'reliefAtSource'] : [schemeMode];
 
   return (
-    <div className="grid gap-5 lg:grid-cols-2">
-      <Card
+    <div className="grid gap-6 lg:grid-cols-2">
+      <Panel
         title="Pension contribution impact"
         subtitle="Estimate the effect on take‑home pay and pension added. Includes a “not sure” mode."
       >
         <div className="grid gap-4">
-          <NumberInput label="Gross annual salary" prefix="£" value={salary} onChange={setSalary} hint="annual" />
+          <NumberField label="Gross annual salary" prefix="£" value={salary} onChange={setSalary} hint="annual" />
 
-          <div className="border-t border-white/10 pt-4">
-            <div className="flex flex-wrap items-end justify-between gap-3">
-              <div>
-                <p className="text-sm font-medium text-white/80">Your contribution input</p>
-                <p className="mt-1 text-xs text-white/50">We convert this to an annual gross contribution for the maths.</p>
-              </div>
-              <Segmented
-                value={employeeMode}
-                onChange={setEmployeeMode}
-                options={[
-                  { value: 'percent', label: '% of salary' },
-                  { value: 'monthlyAmount', label: '£/month' },
-                ]}
-              />
-            </div>
+          <SelectField
+            label="Your contribution input"
+            hint="we convert to an annual gross amount"
+            value={employeeMode}
+            onChange={setEmployeeMode}
+            options={[
+              { value: 'percent', label: '% of salary' },
+              { value: 'monthlyAmount', label: '£/month' },
+            ]}
+          />
 
-            <div className="mt-4 grid gap-4">
-              {employeeMode === 'percent' ? (
-                <NumberInput label="Employee contribution" value={employeePct} onChange={setEmployeePct} hint="%" />
-              ) : (
-                <NumberInput
-                  label="Employee contribution"
-                  prefix="£"
-                  value={employeeMonthlyAmount}
-                  onChange={setEmployeeMonthlyAmount}
-                  hint="per month"
-                />
-              )}
-              <NumberInput
-                label="Employer contribution (optional)"
-                value={employerPct}
-                onChange={setEmployerPct}
-                hint="%"
-              />
-            </div>
+          {employeeMode === 'percent' ? (
+            <NumberField label="Employee contribution" value={employeePct} onChange={setEmployeePct} hint="%" />
+          ) : (
+            <NumberField
+              label="Employee contribution"
+              prefix="£"
+              value={employeeMonthlyAmount}
+              onChange={setEmployeeMonthlyAmount}
+              hint="per month"
+            />
+          )}
 
-            <div className="mt-4 divide-y divide-white/10 border-y border-white/10 text-xs text-white/60">
-              <div className="flex items-center justify-between gap-4 py-2">
-                <span>Employee gross contribution (annual)</span>
-                <span className="font-medium text-white/80">{fmtGBP0(result.inputs.employeeGrossAnnualContribution)}</span>
-              </div>
-              <div className="flex items-center justify-between gap-4 py-2">
-                <span>Employer contribution (annual)</span>
-                <span className="font-medium text-white/80">{fmtGBP0(result.inputs.employerGrossAnnualContribution)}</span>
-              </div>
-            </div>
-          </div>
+          <NumberField label="Employer contribution (optional)" value={employerPct} onChange={setEmployerPct} hint="%" />
 
-          <div className="border-t border-white/10 pt-4">
-            <div className="flex flex-wrap items-end justify-between gap-3">
-              <div>
-                <p className="text-sm font-medium text-white/80">Pension scheme type</p>
-                <p className="mt-1 text-xs text-white/50">If you’re unsure, we’ll show a range.</p>
-              </div>
-              <select
-                className="rounded-xl border border-white/10 bg-bg-900/70 px-3 py-2 text-sm text-white/80 outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-950"
-                value={schemeMode}
-                onChange={(e) => setSchemeMode(e.target.value as SchemeMode)}
-              >
-                <option value="notSure">Not sure (show range)</option>
-                <option value="salarySacrifice">Salary sacrifice</option>
-                <option value="netPay">Net pay arrangement</option>
-                <option value="reliefAtSource">Relief at source</option>
-              </select>
-            </div>
+          <KeyValueList
+            items={[
+              {
+                label: 'Employee gross contribution (annual)',
+                value: fmtGBP0(result.inputs.employeeGrossAnnualContribution),
+                emphasis: 'strong',
+              },
+              {
+                label: 'Employer contribution (annual)',
+                value: fmtGBP0(result.inputs.employerGrossAnnualContribution),
+                emphasis: 'strong',
+              },
+            ]}
+          />
 
-            <div className="mt-4 text-xs text-white/60">
-              <p className="font-medium text-white/70">Assumptions / caveats</p>
-              <ul className="mt-2 list-disc space-y-1 pl-4">
-                <li>Tax year assumptions: {DEFAULT_UK_ASSUMPTIONS.taxYear} (rough estimate).</li>
-                <li>We ignore student loans, childcare, benefits, and tapering edge cases.</li>
-                <li>Employer contributions are assumed to be additional (not matched/conditional).</li>
-                <li>Relief-at-source assumes you claim no extra higher-rate relief here.</li>
-              </ul>
-              <p className="mt-3">Educational estimates only — not financial advice.</p>
-            </div>
-          </div>
+          <SelectField
+            label="Pension scheme type"
+            hint="if you’re unsure, we’ll show a range"
+            value={schemeMode}
+            onChange={setSchemeMode}
+            options={[
+              { value: 'notSure', label: 'Not sure (show range)' },
+              { value: 'salarySacrifice', label: 'Salary sacrifice' },
+              { value: 'netPay', label: 'Net pay arrangement' },
+              { value: 'reliefAtSource', label: 'Relief at source' },
+            ]}
+          />
+
+          <Disclosure title="Assumptions / caveats" defaultOpen>
+            <ul className="list-disc space-y-1 pl-5 text-xs">
+              <li>Tax year assumptions: {DEFAULT_UK_ASSUMPTIONS.taxYear} (rough estimate).</li>
+              <li>We ignore student loans, childcare, benefits, and tapering edge cases.</li>
+              <li>Employer contributions are assumed to be additional (not matched/conditional).</li>
+              <li>Relief-at-source assumes you claim no extra higher-rate relief here.</li>
+            </ul>
+            <p className="text-xs text-white/55">Educational estimates only — not financial advice.</p>
+          </Disclosure>
         </div>
-      </Card>
+      </Panel>
 
-      <Card title="Results">
+      <Panel title="Results">
         <div className="space-y-4">
-          <div className="divide-y divide-white/10 border-y border-white/10">
-            <div className="py-2">
-              <Row
-                label="Baseline net monthly (no pension)"
-                value={fmtGBP(result.baseline.netMonthly)}
-                accent="text-neon-cyan"
-              />
-            </div>
-            <div className="py-2">
-              <Row label="Baseline net annual" value={fmtGBP(result.baseline.netAnnual)} />
-            </div>
+          <div className="flex items-baseline justify-between gap-6">
+            <span className="text-sm text-white/65">Baseline net monthly (no pension)</span>
+            <span className="text-2xl font-semibold text-neon-cyan tabular-nums">{fmtGBP(result.baseline.netMonthly)}</span>
           </div>
+
+          <KeyValueList
+            items={[
+              { label: 'Baseline net monthly', value: fmtGBP(result.baseline.netMonthly), emphasis: 'accent' },
+              { label: 'Baseline net annual', value: fmtGBP(result.baseline.netAnnual) },
+            ]}
+          />
 
           {shownScenarios.length === 1 ? (
             <ScenarioPanel scenario={result.scenarios[shownScenarios[0]]} />
           ) : (
-            <div className="border-t border-white/10 pt-4">
-              <p className="text-sm font-medium text-white/80">Not sure mode: compare scenarios</p>
-              <p className="mt-1 text-xs text-white/50">
+            <Disclosure title="Not sure mode: compare scenarios" defaultOpen>
+              <p className="text-xs text-white/55">
                 Pick the one that matches your payslip/pension docs for the most accurate estimate.
               </p>
 
-              <div className="mt-3 overflow-x-auto">
+              <div className="overflow-x-auto">
                 <table className="w-full min-w-[520px] text-left text-xs">
                   <thead className="text-white/50">
                     <tr>
@@ -184,7 +167,7 @@ export function PensionContributionImpactCalculator() {
                       const s = result.scenarios[k];
                       return (
                         <tr key={k} className="border-t border-white/10">
-                          <td className="py-2 font-medium text-white/85">{s.label}</td>
+                          <td className="py-2 font-medium text-white/90">{s.label}</td>
                           <td className="py-2">{fmtGBP(s.netMonthly)}</td>
                           <td className="py-2 text-white/70">-{fmtGBP(s.takeHomeChangeMonthly)}/mo</td>
                           <td className="py-2 text-white/70">{fmtGBP0(s.totalPensionAddedAnnual)}/yr</td>
@@ -195,26 +178,23 @@ export function PensionContributionImpactCalculator() {
                 </table>
               </div>
 
-              <div className="mt-4">
+              <div>
                 {shownScenarios.map((k) => (
-                  <details key={k} className="border-t border-white/10 pt-3">
-                    <summary className="cursor-pointer select-none text-xs font-medium text-white/70 outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-950">
-                      {result.scenarios[k].label} — notes
-                    </summary>
-                    <ul className="mt-2 list-disc space-y-1 pl-4 text-xs text-white/60">
+                  <Disclosure key={k} title={`${result.scenarios[k].label} — notes`}>
+                    <ul className="list-disc space-y-1 pl-5 text-xs">
                       {result.scenarios[k].notes.map((n) => (
                         <li key={n}>{n}</li>
                       ))}
                     </ul>
-                  </details>
+                  </Disclosure>
                 ))}
               </div>
-            </div>
+            </Disclosure>
           )}
         </div>
-      </Card>
+      </Panel>
 
-      <div className="lg:col-span-2 pt-2">
+      <div className="lg:col-span-2 pt-1">
         <HowItsCalculated
           bullets={[
             'We start with a baseline take-home estimate (income tax + employee NI) using the current tax year assumptions.',
@@ -239,73 +219,26 @@ function ScenarioPanel({
 }) {
   return (
     <div className="border-t border-white/10 pt-4">
-      <p className="text-sm font-medium text-white/80">{scenario.label}</p>
+      <p className="text-sm font-semibold text-white/80">{scenario.label}</p>
 
-      <div className="mt-3 divide-y divide-white/10 border-y border-white/10">
-        <div className="py-2">
-          <Row label="Net monthly (est.)" value={fmtGBP(scenario.netMonthly)} accent="text-neon-cyan" />
-        </div>
-        <div className="py-2">
-          <Row label="Net annual (est.)" value={fmtGBP(scenario.netAnnual)} />
-        </div>
-        <div className="py-2">
-          <Row label="Take-home change" value={`-${fmtGBP(scenario.takeHomeChangeMonthly)}/mo`} accent="text-neon-pink" />
-        </div>
-        <div className="py-2">
-          <Row label="Total pension added" value={`${fmtGBP0(scenario.totalPensionAddedAnnual)}/yr`} accent="text-neon-lime" />
-        </div>
+      <div className="mt-3">
+        <KeyValueList
+          items={[
+            { label: 'Net monthly (est.)', value: fmtGBP(scenario.netMonthly), emphasis: 'accent' },
+            { label: 'Net annual (est.)', value: fmtGBP(scenario.netAnnual) },
+            { label: 'Take-home change', value: `-${fmtGBP(scenario.takeHomeChangeMonthly)}/mo` },
+            { label: 'Total pension added', value: `${fmtGBP0(scenario.totalPensionAddedAnnual)}/yr` },
+          ]}
+        />
       </div>
 
-      <details className="mt-3 border-t border-white/10 pt-3">
-        <summary className="cursor-pointer select-none text-xs font-medium text-white/70 outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-950">
-          Notes
-        </summary>
-        <ul className="mt-2 list-disc space-y-1 pl-4 text-xs text-white/60">
+      <Disclosure title="Notes">
+        <ul className="list-disc space-y-1 pl-5 text-xs">
           {scenario.notes.map((n) => (
             <li key={n}>{n}</li>
           ))}
         </ul>
-      </details>
-    </div>
-  );
-}
-
-function Row({ label, value, accent }: { label: string; value: string; accent?: string }) {
-  return (
-    <div className="flex items-center justify-between gap-6">
-      <span className="text-sm text-white/60">{label}</span>
-      <span className={`text-sm font-medium ${accent || 'text-white/85'}`}>{value}</span>
-    </div>
-  );
-}
-
-function Segmented<T extends string>({
-  value,
-  onChange,
-  options,
-}: {
-  value: T;
-  onChange: (v: T) => void;
-  options: { value: T; label: string }[];
-}) {
-  return (
-    <div className="inline-flex rounded-xl border border-white/10 bg-bg-900/70 p-1">
-      {options.map((o) => {
-        const active = o.value === value;
-        return (
-          <button
-            key={o.value}
-            type="button"
-            onClick={() => onChange(o.value)}
-            className={
-              'rounded-lg px-3 py-1.5 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/50 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-950 ' +
-              (active ? 'bg-white/10 text-white' : 'text-white/60 hover:bg-white/5 hover:text-white/75')
-            }
-          >
-            {o.label}
-          </button>
-        );
-      })}
+      </Disclosure>
     </div>
   );
 }

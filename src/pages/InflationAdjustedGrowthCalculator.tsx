@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react';
-import { Card } from '../components/Card';
+
 import { HowItsCalculated } from '../components/HowItsCalculated';
-import { NumberInput } from '../components/NumberInput';
 import { YearlyLineChart } from '../components/YearlyLineChart';
 import { computeInflationAdjustedGrowth } from '../lib/inflationAdjustedGrowth';
+import { Disclosure, KeyValueList, NumberField, Panel, chartTokens } from '../ui';
 
 function fmtGBP(n: number) {
   return new Intl.NumberFormat('en-GB', {
@@ -37,70 +37,62 @@ export function InflationAdjustedGrowthCalculator() {
   );
 
   return (
-    <div className="grid gap-5 lg:grid-cols-2">
-      <Card title="Inflation-adjusted growth" subtitle="Nominal vs real (today’s £) estimate with monthly contributions.">
+    <div className="grid gap-6 lg:grid-cols-2">
+      <Panel title="Inflation‑adjusted growth" subtitle="Nominal vs real (today’s £) estimate with monthly contributions.">
         <div className="grid gap-4">
-          <NumberInput label="Starting balance" prefix="£" value={startingBalance} onChange={setStartingBalance} />
-          <NumberInput
+          <NumberField label="Starting balance" prefix="£" value={startingBalance} onChange={setStartingBalance} />
+          <NumberField
             label="Monthly contribution"
             prefix="£"
             value={monthlyContribution}
             onChange={setMonthlyContribution}
             hint="per month"
           />
-          <NumberInput
+          <NumberField
             label="Annual return (nominal)"
             value={annualReturnPct}
             onChange={setAnnualReturnPct}
             hint="% per year"
           />
-          <NumberInput
-            label="Annual inflation"
-            value={annualInflationPct}
-            onChange={setAnnualInflationPct}
-            hint="% per year"
-          />
-          <NumberInput label="Time horizon" value={years} onChange={setYears} hint="years" />
+          <NumberField label="Annual inflation" value={annualInflationPct} onChange={setAnnualInflationPct} hint="% per year" />
+          <NumberField label="Time horizon" value={years} onChange={setYears} hint="years" inputMode="numeric" />
 
-          <div className="border-t border-white/10 pt-4 text-xs text-white/60">
-            <p className="font-medium text-white/70">Assumptions (read me)</p>
-            <ul className="mt-2 list-disc space-y-1 pl-4">
+          <Disclosure title="Assumptions" defaultOpen>
+            <ul className="list-disc space-y-1 pl-5 text-xs">
               <li>Constant nominal return ({fmtPct(result.inputs.annualReturnPct)}) with monthly compounding.</li>
               <li>
                 Constant inflation ({fmtPct(result.inputs.annualInflationPct)}), used to convert to{' '}
-                <span className="text-white/70">today’s pounds</span>.
+                <span className="text-white/75">today’s pounds</span>.
               </li>
               <li>
-                Contributions happen at the <span className="text-white/70">end</span> of each month.
+                Contributions happen at the <span className="text-white/75">end</span> of each month.
               </li>
               <li>Ignores fees, taxes, volatility and sequence risk.</li>
             </ul>
-            <p className="mt-3">
+            <p className="text-xs text-white/55">
               Educational estimates only — not financial advice. Inflation is unpredictable; real returns can be negative.
             </p>
-          </div>
+          </Disclosure>
         </div>
-      </Card>
+      </Panel>
 
-      <Card title="Results">
-        <div className="space-y-3">
-          <div className="divide-y divide-white/10 border-y border-white/10">
-            <div className="py-2">
-              <Row label="Final (nominal)" value={fmtGBP(result.finalBalanceNominal)} accent="text-neon-cyan" />
-            </div>
-            <div className="py-2">
-              <Row label="Final (real, today’s £)" value={fmtGBP(result.finalBalanceReal)} accent="text-neon-pink" />
-            </div>
-            <div className="py-2">
-              <Row label="Total contributed" value={fmtGBP(result.totalContributedNominal)} accent="text-neon-lime" />
-            </div>
+      <Panel title="Results">
+        <div className="space-y-4">
+          <div className="flex items-baseline justify-between gap-6">
+            <span className="text-sm text-white/65">Final value (real, today’s £)</span>
+            <span className="text-2xl font-semibold text-neon-cyan tabular-nums">{fmtGBP(result.finalBalanceReal)}</span>
           </div>
 
-          <details className="border-t border-white/10 pt-4" open>
-            <summary className="cursor-pointer select-none text-sm font-medium text-white/70 outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-950">
-              Value over time (nominal vs real)
-            </summary>
-            <div className="mt-3">
+          <KeyValueList
+            items={[
+              { label: 'Final (nominal)', value: fmtGBP(result.finalBalanceNominal) },
+              { label: 'Final (real, today’s £)', value: fmtGBP(result.finalBalanceReal), emphasis: 'accent' },
+              { label: 'Total contributed', value: fmtGBP(result.totalContributedNominal) },
+            ]}
+          />
+
+          <Disclosure title="Value over time (nominal vs real)" defaultOpen>
+            <div>
               <YearlyLineChart
                 years={result.yearly.map((r) => r.year)}
                 valueFormatter={fmtGBP}
@@ -108,25 +100,22 @@ export function InflationAdjustedGrowthCalculator() {
                   {
                     label: 'Nominal end',
                     values: result.yearly.map((r) => r.endBalanceNominal),
-                    borderColor: 'rgba(34, 211, 238, 0.95)',
-                    backgroundColor: 'rgba(34, 211, 238, 0.12)',
+                    borderColor: chartTokens.neutralLine,
+                    backgroundColor: chartTokens.neutralFill,
                     fill: false,
                   },
                   {
                     label: 'Real end (today’s £)',
                     values: result.yearly.map((r) => r.endBalanceReal),
-                    borderColor: 'rgba(236, 72, 153, 0.95)',
-                    backgroundColor: 'rgba(236, 72, 153, 0.10)',
+                    borderColor: chartTokens.accentLine,
+                    backgroundColor: chartTokens.accentFill,
                     fill: false,
                   },
                 ]}
               />
 
-              <details className="mt-4 border-t border-white/10 pt-3">
-                <summary className="cursor-pointer select-none text-xs font-medium text-white/70 outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-950">
-                  Show table
-                </summary>
-                <div className="mt-3 overflow-x-auto">
+              <Disclosure title="Show table">
+                <div className="overflow-x-auto">
                   <table className="w-full min-w-[520px] text-left text-xs">
                     <thead className="text-white/50">
                       <tr>
@@ -140,21 +129,21 @@ export function InflationAdjustedGrowthCalculator() {
                       {result.yearly.map((row) => (
                         <tr key={row.year} className="border-t border-white/10">
                           <td className="py-2">{row.year}</td>
-                          <td className="py-2 font-medium text-white/85">{fmtGBP(row.endBalanceNominal)}</td>
-                          <td className="py-2 text-white/70">{fmtGBP(row.endBalanceReal)}</td>
+                          <td className="py-2 font-medium text-white/90">{fmtGBP(row.endBalanceNominal)}</td>
+                          <td className="py-2 text-white/75">{fmtGBP(row.endBalanceReal)}</td>
                           <td className="py-2 text-white/70">{fmtGBP(row.totalContributedNominal)}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
-              </details>
+              </Disclosure>
             </div>
-          </details>
+          </Disclosure>
         </div>
-      </Card>
+      </Panel>
 
-      <div className="lg:col-span-2 pt-2">
+      <div className="lg:col-span-2 pt-1">
         <HowItsCalculated
           bullets={[
             'We compound the balance monthly using the nominal annual return divided by 12 (constant-rate model).',
@@ -169,15 +158,6 @@ export function InflationAdjustedGrowthCalculator() {
           ]}
         />
       </div>
-    </div>
-  );
-}
-
-function Row({ label, value, accent }: { label: string; value: string; accent?: string }) {
-  return (
-    <div className="flex items-center justify-between gap-6">
-      <span className="text-sm text-white/60">{label}</span>
-      <span className={`text-sm font-medium ${accent || 'text-white/85'}`}>{value}</span>
     </div>
   );
 }

@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react';
-import { Card } from '../components/Card';
+
 import { HowItsCalculated } from '../components/HowItsCalculated';
-import { NumberInput } from '../components/NumberInput';
 import { computePayRiseImpact } from '../lib/payRiseImpact';
 import { DEFAULT_UK_ASSUMPTIONS } from '../lib/ukTax';
+import { Disclosure, KeyValueList, NumberField, Panel } from '../ui';
 
 function fmtGBP(n: number) {
   return new Intl.NumberFormat('en-GB', {
@@ -29,91 +29,88 @@ export function PayRiseImpactCalculator() {
   const deltaGrossMonthly = result.deltaGrossAnnual / 12;
 
   return (
-    <div className="grid gap-5 lg:grid-cols-2">
-      <Card
+    <div className="grid gap-6 lg:grid-cols-2">
+      <Panel
         title="Pay rise impact"
         subtitle="Rough estimate of how much of a gross pay rise you keep after income tax + employee NI (England/Wales/NI)."
       >
         <div className="grid gap-4">
-          <NumberInput label="Current gross annual salary" prefix="£" value={currentSalary} onChange={setCurrentSalary} />
-          <NumberInput label="New gross annual salary" prefix="£" value={newSalary} onChange={setNewSalary} />
+          <NumberField label="Current gross annual salary" prefix="£" value={currentSalary} onChange={setCurrentSalary} />
+          <NumberField label="New gross annual salary" prefix="£" value={newSalary} onChange={setNewSalary} />
 
-          <div className="border-t border-white/10 pt-4 text-xs text-white/60">
-            <p className="font-medium text-white/70">Assumptions (read me)</p>
-            <ul className="mt-2 list-disc space-y-1 pl-4">
+          <Disclosure title="Assumptions" defaultOpen>
+            <ul className="list-disc space-y-1 pl-5 text-xs">
               <li>Tax year: {DEFAULT_UK_ASSUMPTIONS.taxYear}.</li>
               <li>Income tax + employee NI only (no pension, student loan, benefits, salary sacrifice, etc.).</li>
               <li>
-                Same assumptions as the take-home calculator; this is a <span className="text-white/70">delta</span>{' '}
+                Same assumptions as the take-home calculator; this is a <span className="text-white/75">delta</span>{' '}
                 view.
               </li>
             </ul>
-            <p className="mt-3">Educational estimates only — not financial advice.</p>
-          </div>
+            <p className="text-xs text-white/55">Educational estimates only — not financial advice.</p>
+          </Disclosure>
         </div>
-      </Card>
+      </Panel>
 
-      <Card title="Results">
+      <Panel title="Results">
         <div className="space-y-4">
-          <div className="divide-y divide-white/10 border-y border-white/10">
-            <div className="py-2">
-              <Row label="Gross change (annual)" value={fmtGBP(result.deltaGrossAnnual)} accent="text-white/85" />
-            </div>
-            <div className="py-2">
-              <Row label="Gross change (monthly)" value={fmtGBP(deltaGrossMonthly)} accent="text-white/70" />
-            </div>
-            <div className="py-2">
-              <Row label="Net change (annual)" value={fmtGBP(result.deltaNetAnnual)} accent="text-neon-cyan" />
-            </div>
-            <div className="py-2">
-              <Row label="Net change (monthly)" value={fmtGBP(result.deltaNetMonthly)} accent="text-neon-cyan" />
-            </div>
+          <div className="flex items-baseline justify-between gap-6">
+            <span className="text-sm text-white/65">Net change (monthly)</span>
+            <span className="text-2xl font-semibold text-neon-cyan tabular-nums">{fmtGBP(result.deltaNetMonthly)}</span>
           </div>
 
-          <div className="border-t border-white/10 pt-4">
-            <div className="divide-y divide-white/10">
-              <div className="py-2">
-                <Row label="You keep (effective)" value={fmtPct(result.keepRate)} accent="text-neon-lime" />
-              </div>
-              <div className="py-2">
-                <Row
-                  label="Lost to tax+NI (effective)"
-                  value={fmtPct(result.effectiveDeductionRate)}
-                  accent="text-neon-pink"
-                />
-              </div>
-            </div>
-          </div>
+          <KeyValueList
+            items={[
+              { label: 'Gross change (annual)', value: fmtGBP(result.deltaGrossAnnual) },
+              { label: 'Gross change (monthly)', value: fmtGBP(deltaGrossMonthly) },
+              { label: 'Net change (annual)', value: fmtGBP(result.deltaNetAnnual), emphasis: 'accent' },
+              { label: 'Net change (monthly)', value: fmtGBP(result.deltaNetMonthly), emphasis: 'accent' },
+            ]}
+          />
 
-          <details className="border-t border-white/10 pt-4">
-            <summary className="cursor-pointer select-none text-sm font-medium text-white/70 outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-950">
-              Before vs after (take-home)
-            </summary>
+          <KeyValueList
+            className="border-t-0"
+            items={[
+              { label: 'You keep (effective)', value: fmtPct(result.keepRate), emphasis: 'accent' },
+              { label: 'Lost to tax+NI (effective)', value: fmtPct(result.effectiveDeductionRate) },
+            ]}
+          />
 
-            <div className="mt-3 grid gap-4 divide-y divide-white/10 md:grid-cols-2 md:divide-y-0 md:divide-x">
+          <Disclosure title="Before vs after (take‑home)">
+            <div className="grid gap-4 divide-y divide-white/10 md:grid-cols-2 md:divide-y-0 md:divide-x">
               <div className="pt-3 md:pt-0 md:pr-6">
                 <p className="text-xs font-semibold tracking-widest text-white/50">CURRENT</p>
-                <div className="mt-2 grid gap-1">
-                  <SmallRow label="Net monthly (est.)" value={fmtGBP(result.current.netMonthly)} />
-                  <SmallRow label="Income tax (annual)" value={fmtGBP(result.current.incomeTaxAnnual)} />
-                  <SmallRow label="Employee NI (annual)" value={fmtGBP(result.current.niAnnual)} />
+                <div className="mt-2">
+                  <KeyValueList
+                    className="border-y-0"
+                    items={[
+                      { label: 'Net monthly (est.)', value: fmtGBP(result.current.netMonthly), emphasis: 'strong' },
+                      { label: 'Income tax (annual)', value: fmtGBP(result.current.incomeTaxAnnual) },
+                      { label: 'Employee NI (annual)', value: fmtGBP(result.current.niAnnual) },
+                    ]}
+                  />
                 </div>
               </div>
 
               <div className="pt-3 md:pt-0 md:pl-6">
                 <p className="text-xs font-semibold tracking-widest text-white/50">NEW</p>
-                <div className="mt-2 grid gap-1">
-                  <SmallRow label="Net monthly (est.)" value={fmtGBP(result.next.netMonthly)} />
-                  <SmallRow label="Income tax (annual)" value={fmtGBP(result.next.incomeTaxAnnual)} />
-                  <SmallRow label="Employee NI (annual)" value={fmtGBP(result.next.niAnnual)} />
+                <div className="mt-2">
+                  <KeyValueList
+                    className="border-y-0"
+                    items={[
+                      { label: 'Net monthly (est.)', value: fmtGBP(result.next.netMonthly), emphasis: 'strong' },
+                      { label: 'Income tax (annual)', value: fmtGBP(result.next.incomeTaxAnnual) },
+                      { label: 'Employee NI (annual)', value: fmtGBP(result.next.niAnnual) },
+                    ]}
+                  />
                 </div>
               </div>
             </div>
-          </details>
+          </Disclosure>
         </div>
-      </Card>
+      </Panel>
 
-      <div className="lg:col-span-2 pt-2">
+      <div className="lg:col-span-2 pt-1">
         <HowItsCalculated
           bullets={[
             'We compute take-home for the current salary and the new salary using the same simplified UK tax/NI assumptions.',
@@ -126,24 +123,6 @@ export function PayRiseImpactCalculator() {
           ]}
         />
       </div>
-    </div>
-  );
-}
-
-function Row({ label, value, accent }: { label: string; value: string; accent?: string }) {
-  return (
-    <div className="flex items-center justify-between gap-6">
-      <span className="text-sm text-white/60">{label}</span>
-      <span className={`text-sm font-medium ${accent || 'text-white/85'}`}>{value}</span>
-    </div>
-  );
-}
-
-function SmallRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-center justify-between gap-6">
-      <span className="text-xs text-white/60">{label}</span>
-      <span className="text-xs font-medium text-white/80">{value}</span>
     </div>
   );
 }
