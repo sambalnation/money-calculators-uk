@@ -91,7 +91,7 @@ export function Tabs<T extends string>({
                 }}
                 className={
                   'relative -mb-px rounded-t-xl border px-4 py-2 text-xs font-semibold tracking-wide transition ' +
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/60 ' +
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-900 ' +
                   (active
                     ? 'border-white/20 bg-bg-900 text-white shadow-neon'
                     : 'border-transparent bg-transparent text-white/60 hover:border-white/10 hover:bg-white/5 hover:text-white/85')
