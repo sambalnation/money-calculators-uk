@@ -85,10 +85,6 @@ export function CompoundGrowthCalculator() {
                 <option value="startOfPeriod">Start of month</option>
               </select>
             </div>
-
-            <p className="mt-3 text-xs text-white/60">
-              Currently selected: <span className="font-medium text-white/75">{timingLabel(contributionTiming)}</span>
-            </p>
           </div>
 
           <div className="rounded-xl border border-white/10 bg-bg-900/40 p-4 text-xs text-white/60">
