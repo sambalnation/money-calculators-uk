@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
 
+const SOURCES_LAST_VERIFIED = '6 Feb 2026';
+
 export type SourceLink = {
   label: string;
   href: string;
@@ -50,6 +52,9 @@ export function HowItsCalculated({
                 </li>
               ))}
             </ul>
+            <p className="mt-2 text-xs text-white/40">
+              Sources last verified: {SOURCES_LAST_VERIFIED} (updated when we review sources; not every release)
+            </p>
           </div>
         ) : null}
       </div>
