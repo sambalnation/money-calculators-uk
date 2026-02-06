@@ -18,7 +18,7 @@ export function NumberInput({
         {hint ? <span className="text-xs text-white/40">{hint}</span> : null}
       </div>
 
-      <div className="mt-2 flex items-center rounded-xl border border-white/10 bg-bg-900/70 px-3 py-2">
+      <div className="mt-2 flex items-center rounded-xl border border-white/10 bg-bg-900/70 px-3 py-2 transition-colors focus-within:border-neon-cyan/40 focus-within:bg-bg-900/90">
         {prefix ? <span className="mr-2 text-sm text-white/50">{prefix}</span> : null}
         <input
           className="w-full bg-transparent text-base outline-none placeholder:text-white/20"
