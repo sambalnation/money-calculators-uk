@@ -110,7 +110,7 @@ export default function App() {
               </li>
             </ul>
             <p className="mt-3 text-xs text-white/50">
-              Sources last verified: 6 Feb 2025. We don't track you. We don't store inputs. Double-check results against official calculators/payroll when making decisions.
+              Sources last verified: 6 Feb 2026. We don't track you. We don't store inputs. Double-check results against official calculators/payroll when making decisions.
             </p>
           </section>
 
