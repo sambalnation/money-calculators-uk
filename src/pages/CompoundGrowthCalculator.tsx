@@ -69,16 +69,16 @@ export function CompoundGrowthCalculator() {
           />
           <NumberInput label="Time horizon" value={years} onChange={setYears} hint="years" />
 
-          <div className="rounded-xl border border-white/10 bg-bg-900/40 p-4">
-            <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="border-t border-white/10 pt-4">
+            <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
                 <p className="text-sm font-medium text-white/80">Contribution timing</p>
-                <p className="text-xs text-white/50">
-                  If you invest at the start of the month, you usually get a tiny boost vs end-of-month saving.
+                <p className="mt-1 text-xs text-white/50">
+                  Investing at the start of the month usually gives a tiny boost vs end-of-month saving.
                 </p>
               </div>
               <select
-                className="rounded-xl border border-white/10 bg-bg-900/70 px-3 py-2 text-sm text-white/80 outline-none transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-900"
+                className="rounded-xl border border-white/10 bg-bg-900/70 px-3 py-2 text-sm text-white/80 outline-none transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-950"
                 value={contributionTiming}
                 onChange={(e) => setContributionTiming(e.target.value as ContributionTiming)}
               >
@@ -88,16 +88,17 @@ export function CompoundGrowthCalculator() {
             </div>
           </div>
 
-          <div className="rounded-xl border border-white/10 bg-bg-900/40 p-4 text-xs text-white/60">
+          <div className="border-t border-white/10 pt-4 text-xs text-white/60">
             <p className="font-medium text-white/70">Assumptions (read me)</p>
             <ul className="mt-2 list-disc space-y-1 pl-4">
+              <li>Constant annual growth rate ({fmtPct(result.inputs.annualRatePct)}) with monthly compounding.</li>
               <li>
-                Constant annual growth rate ({fmtPct(result.inputs.annualRatePct)}) with monthly compounding.
+                Simple fee model: an annual fee of {fmtPct(result.inputs.annualFeePct)} is charged evenly each month as a %
+                of your current balance.
               </li>
               <li>
-                Simple fee model: an annual fee of {fmtPct(result.inputs.annualFeePct)} is charged evenly each month as a % of your current balance.
+                Contributions are applied: <span className="text-white/70">{timingLabel(contributionTiming)}</span>.
               </li>
-              <li>Contributions are applied: <span className="text-white/70">{timingLabel(contributionTiming)}</span>.</li>
               <li>Ignores taxes, inflation, and volatility (real investing is messier).</li>
             </ul>
             <p className="mt-3">
@@ -114,13 +115,19 @@ export function CompoundGrowthCalculator() {
             <span className="text-2xl font-semibold text-neon-cyan">{fmtGBP(result.finalBalance)}</span>
           </div>
 
-          <div className="grid gap-2 rounded-xl border border-white/10 bg-bg-900/40 p-4">
-            <Row label="Total contributed" value={fmtGBP(result.totalContributed)} accent="text-neon-lime" />
-            <Row label="Total growth" value={fmtGBP(result.totalGrowth)} accent="text-neon-pink" />
+          <div className="divide-y divide-white/10 border-y border-white/10">
+            <div className="py-2">
+              <Row label="Total contributed" value={fmtGBP(result.totalContributed)} accent="text-neon-lime" />
+            </div>
+            <div className="py-2">
+              <Row label="Total growth" value={fmtGBP(result.totalGrowth)} accent="text-neon-pink" />
+            </div>
           </div>
 
-          <details className="rounded-xl border border-white/10 bg-bg-900/30 p-4" open>
-            <summary className="cursor-pointer select-none text-sm font-medium text-white/70 outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-900">Balance over time</summary>
+          <details className="border-t border-white/10 pt-4" open>
+            <summary className="cursor-pointer select-none text-sm font-medium text-white/70 outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-950">
+              Balance over time
+            </summary>
             <div className="mt-3">
               <YearlyLineChart
                 years={result.yearly.map((r) => r.year)}
@@ -143,8 +150,10 @@ export function CompoundGrowthCalculator() {
                 ]}
               />
 
-              <details className="mt-4 rounded-xl border border-white/10 bg-bg-900/20 p-3">
-                <summary className="cursor-pointer select-none text-xs font-medium text-white/70 outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-900">Show table</summary>
+              <details className="mt-4 border-t border-white/10 pt-3">
+                <summary className="cursor-pointer select-none text-xs font-medium text-white/70 outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-950">
+                  Show table
+                </summary>
                 <div className="mt-3 overflow-x-auto">
                   <table className="w-full min-w-[420px] text-left text-xs">
                     <thead className="text-white/50">
@@ -173,7 +182,7 @@ export function CompoundGrowthCalculator() {
         </div>
       </Card>
 
-      <div className="lg:col-span-2">
+      <div className="lg:col-span-2 pt-2">
         <HowItsCalculated
           bullets={[
             'We convert the annual growth rate into a monthly rate by dividing by 12 (simple, constant-rate model).',

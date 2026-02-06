@@ -63,7 +63,7 @@ export default function App() {
     <div className="min-h-full">
       <div className="mx-auto max-w-5xl px-4 py-10">
         <header className="mb-6">
-          <div className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-2 shadow-neon">
+          <div className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2">
             <span className="h-2 w-2 rounded-full bg-neon-cyan" />
             <span className="text-xs font-semibold tracking-widest text-white/70">MONEY CALCULATORS UK</span>
           </div>
@@ -76,7 +76,7 @@ export default function App() {
           </p>
         </header>
 
-        <main className="space-y-6">
+        <main className="space-y-10">
           <Tabs
             items={items}
             activeId={active}
@@ -85,47 +85,71 @@ export default function App() {
             maxPrimaryTabs={4}
           />
 
-          <section id="method" className="scroll-mt-24 rounded-2xl border border-white/10 bg-bg-900 p-5">
+          <section id="method" className="scroll-mt-24 border-t border-white/10 pt-8">
             <h2 className="text-lg font-semibold">Method &amp; sources</h2>
             <p className="mt-2 max-w-3xl text-sm text-white/60">
-              These calculators run entirely in your browser (no accounts, no server-side computation). Where a tool uses UK tax
-              thresholds, we link the relevant GOV.UK/HMRC guidance.
+              These calculators run entirely in your browser (no accounts, no server-side computation). Where a tool uses UK
+              tax thresholds, we link the relevant GOV.UK/HMRC guidance.
             </p>
-            <ul className="mt-3 grid gap-2 text-sm text-white/70 md:grid-cols-2">
-              <li className="rounded-xl border border-white/10 bg-bg-950/60 p-3">
+
+            <ul className="mt-3 space-y-2 text-sm text-white/70">
+              <li>
                 Income Tax rates (GOV.UK):{' '}
-                <a className="underline decoration-white/20 underline-offset-4 hover:decoration-white/40" href="https://www.gov.uk/income-tax-rates" target="_blank" rel="noreferrer">
+                <a
+                  className="underline decoration-white/20 underline-offset-4 hover:decoration-white/40"
+                  href="https://www.gov.uk/income-tax-rates"
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   gov.uk/income-tax-rates
                 </a>
               </li>
-              <li className="rounded-xl border border-white/10 bg-bg-950/60 p-3">
+              <li>
                 National Insurance rates (GOV.UK):{' '}
-                <a className="underline decoration-white/20 underline-offset-4 hover:decoration-white/40" href="https://www.gov.uk/national-insurance-rates-letters" target="_blank" rel="noreferrer">
+                <a
+                  className="underline decoration-white/20 underline-offset-4 hover:decoration-white/40"
+                  href="https://www.gov.uk/national-insurance-rates-letters"
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   gov.uk/national-insurance-rates-letters
                 </a>
               </li>
-              <li className="rounded-xl border border-white/10 bg-bg-950/60 p-3">
+              <li>
                 Pension tax relief (GOV.UK):{' '}
-                <a className="underline decoration-white/20 underline-offset-4 hover:decoration-white/40" href="https://www.gov.uk/tax-on-your-private-pension/pension-tax-relief" target="_blank" rel="noreferrer">
+                <a
+                  className="underline decoration-white/20 underline-offset-4 hover:decoration-white/40"
+                  href="https://www.gov.uk/tax-on-your-private-pension/pension-tax-relief"
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   gov.uk/.../pension-tax-relief
                 </a>
               </li>
-              <li className="rounded-xl border border-white/10 bg-bg-950/60 p-3">
+              <li>
                 UK inflation statistics (ONS):{' '}
-                <a className="underline decoration-white/20 underline-offset-4 hover:decoration-white/40" href="https://www.ons.gov.uk/economy/inflationandpriceindices" target="_blank" rel="noreferrer">
+                <a
+                  className="underline decoration-white/20 underline-offset-4 hover:decoration-white/40"
+                  href="https://www.ons.gov.uk/economy/inflationandpriceindices"
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   ons.gov.uk/.../inflationandpriceindices
                 </a>
               </li>
             </ul>
+
             <p className="mt-3 text-xs text-white/50">
-              Sources last verified: {SOURCES_LAST_VERIFIED} (updated when we review sources; not every release). We don't track you. We don't store inputs. Double-check results against official calculators/payroll when making decisions.
+              Sources last verified: {SOURCES_LAST_VERIFIED} (updated when we review sources; not every release). We don't
+              track you. We don't store inputs. Double-check results against official calculators/payroll when making
+              decisions.
             </p>
           </section>
 
-          <section className="rounded-2xl border border-white/10 bg-bg-900 p-5">
+          <section className="border-t border-white/10 pt-8">
             <h2 className="text-lg font-semibold">Coming next</h2>
-            <ul className="mt-3 grid gap-2 text-sm text-white/70 md:grid-cols-2">
-              <li className="rounded-xl border border-white/10 bg-bg-950/60 p-3">More UK calculators, one at a time (with tests + clear assumptions)</li>
+            <ul className="mt-3 space-y-2 text-sm text-white/70">
+              <li>More UK calculators, one at a time (with tests + clear assumptions).</li>
             </ul>
           </section>
         </main>

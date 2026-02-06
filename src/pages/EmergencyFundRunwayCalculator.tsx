@@ -38,7 +38,10 @@ export function EmergencyFundRunwayCalculator() {
 
   return (
     <div className="grid gap-5 lg:grid-cols-2">
-      <Card title="Emergency fund runway" subtitle="How long your emergency fund could cover your essentials (monthly averages).">
+      <Card
+        title="Emergency fund runway"
+        subtitle="How long your emergency fund could cover your essentials (monthly averages)."
+      >
         <div className="grid gap-4">
           <NumberInput
             label="Emergency fund balance (cash)"
@@ -61,10 +64,12 @@ export function EmergencyFundRunwayCalculator() {
             hint="benefits/side income/etc."
           />
 
-          <div className="rounded-xl border border-white/10 bg-bg-900/40 p-4 text-xs text-white/60">
+          <div className="border-t border-white/10 pt-4 text-xs text-white/60">
             <p className="font-medium text-white/70">Assumptions (read me)</p>
             <ul className="mt-2 list-disc space-y-1 pl-4">
-              <li>Uses monthly averages: <span className="text-white/70">net burn = spending − income</span>.</li>
+              <li>
+                Uses monthly averages: <span className="text-white/70">net burn = spending − income</span>.
+              </li>
               <li>Ignores interest on cash, inflation, and any investment volatility.</li>
               <li>Doesn’t model one-off costs (car repairs) or one-off income (redundancy pay).</li>
             </ul>
@@ -80,9 +85,13 @@ export function EmergencyFundRunwayCalculator() {
             <span className="text-xl font-semibold text-neon-pink">{netBurnDisplay}</span>
           </div>
 
-          <div className="grid gap-2 rounded-xl border border-white/10 bg-bg-900/40 p-4">
-            <Row label="Runway (months)" value={fmtMonths(result.runwayMonths)} accent="text-neon-cyan" />
-            <Row label="Runway (weeks)" value={fmtWeeks(result.runwayWeeks)} accent="text-neon-lime" />
+          <div className="divide-y divide-white/10 border-y border-white/10">
+            <div className="py-2">
+              <Row label="Runway (months)" value={fmtMonths(result.runwayMonths)} accent="text-neon-cyan" />
+            </div>
+            <div className="py-2">
+              <Row label="Runway (weeks)" value={fmtWeeks(result.runwayWeeks)} accent="text-neon-lime" />
+            </div>
           </div>
 
           {Number.isFinite(result.runwayMonths) ? (
@@ -97,7 +106,7 @@ export function EmergencyFundRunwayCalculator() {
         </div>
       </Card>
 
-      <div className="lg:col-span-2">
+      <div className="lg:col-span-2 pt-2">
         <HowItsCalculated
           bullets={[
             'Net monthly burn is calculated as essential spending minus income during the emergency.',

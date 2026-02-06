@@ -38,12 +38,15 @@ export function PayRiseImpactCalculator() {
           <NumberInput label="Current gross annual salary" prefix="£" value={currentSalary} onChange={setCurrentSalary} />
           <NumberInput label="New gross annual salary" prefix="£" value={newSalary} onChange={setNewSalary} />
 
-          <div className="rounded-xl border border-white/10 bg-bg-900/40 p-4 text-xs text-white/60">
+          <div className="border-t border-white/10 pt-4 text-xs text-white/60">
             <p className="font-medium text-white/70">Assumptions (read me)</p>
             <ul className="mt-2 list-disc space-y-1 pl-4">
               <li>Tax year: {DEFAULT_UK_ASSUMPTIONS.taxYear}.</li>
               <li>Income tax + employee NI only (no pension, student loan, benefits, salary sacrifice, etc.).</li>
-              <li>Same assumptions as the take-home calculator; this is a <span className="text-white/70">delta</span> view.</li>
+              <li>
+                Same assumptions as the take-home calculator; this is a <span className="text-white/70">delta</span>{' '}
+                view.
+              </li>
             </ul>
             <p className="mt-3">Educational estimates only — not financial advice.</p>
           </div>
@@ -51,24 +54,44 @@ export function PayRiseImpactCalculator() {
       </Card>
 
       <Card title="Results">
-        <div className="space-y-3">
-          <div className="grid gap-2 rounded-xl border border-white/10 bg-bg-900/40 p-4">
-            <Row label="Gross change (annual)" value={fmtGBP(result.deltaGrossAnnual)} accent="text-white/85" />
-            <Row label="Gross change (monthly)" value={fmtGBP(deltaGrossMonthly)} accent="text-white/70" />
-            <div className="my-1 h-px bg-white/10" />
-            <Row label="Net change (annual)" value={fmtGBP(result.deltaNetAnnual)} accent="text-neon-cyan" />
-            <Row label="Net change (monthly)" value={fmtGBP(result.deltaNetMonthly)} accent="text-neon-cyan" />
+        <div className="space-y-4">
+          <div className="divide-y divide-white/10 border-y border-white/10">
+            <div className="py-2">
+              <Row label="Gross change (annual)" value={fmtGBP(result.deltaGrossAnnual)} accent="text-white/85" />
+            </div>
+            <div className="py-2">
+              <Row label="Gross change (monthly)" value={fmtGBP(deltaGrossMonthly)} accent="text-white/70" />
+            </div>
+            <div className="py-2">
+              <Row label="Net change (annual)" value={fmtGBP(result.deltaNetAnnual)} accent="text-neon-cyan" />
+            </div>
+            <div className="py-2">
+              <Row label="Net change (monthly)" value={fmtGBP(result.deltaNetMonthly)} accent="text-neon-cyan" />
+            </div>
           </div>
 
-          <div className="grid gap-2 rounded-xl border border-white/10 bg-bg-900/40 p-4">
-            <Row label="You keep (effective)" value={fmtPct(result.keepRate)} accent="text-neon-lime" />
-            <Row label="Lost to tax+NI (effective)" value={fmtPct(result.effectiveDeductionRate)} accent="text-neon-pink" />
+          <div className="border-t border-white/10 pt-4">
+            <div className="divide-y divide-white/10">
+              <div className="py-2">
+                <Row label="You keep (effective)" value={fmtPct(result.keepRate)} accent="text-neon-lime" />
+              </div>
+              <div className="py-2">
+                <Row
+                  label="Lost to tax+NI (effective)"
+                  value={fmtPct(result.effectiveDeductionRate)}
+                  accent="text-neon-pink"
+                />
+              </div>
+            </div>
           </div>
 
-          <details className="rounded-xl border border-white/10 bg-bg-900/30 p-4">
-            <summary className="cursor-pointer select-none text-sm font-medium text-white/70 outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-900">Before vs after (take-home)</summary>
-            <div className="mt-3 grid gap-3 text-sm">
-              <div className="rounded-xl border border-white/10 bg-bg-900/40 p-4">
+          <details className="border-t border-white/10 pt-4">
+            <summary className="cursor-pointer select-none text-sm font-medium text-white/70 outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-950">
+              Before vs after (take-home)
+            </summary>
+
+            <div className="mt-3 grid gap-4 divide-y divide-white/10 md:grid-cols-2 md:divide-y-0 md:divide-x">
+              <div className="pt-3 md:pt-0 md:pr-6">
                 <p className="text-xs font-semibold tracking-widest text-white/50">CURRENT</p>
                 <div className="mt-2 grid gap-1">
                   <SmallRow label="Net monthly (est.)" value={fmtGBP(result.current.netMonthly)} />
@@ -77,7 +100,7 @@ export function PayRiseImpactCalculator() {
                 </div>
               </div>
 
-              <div className="rounded-xl border border-white/10 bg-bg-900/40 p-4">
+              <div className="pt-3 md:pt-0 md:pl-6">
                 <p className="text-xs font-semibold tracking-widest text-white/50">NEW</p>
                 <div className="mt-2 grid gap-1">
                   <SmallRow label="Net monthly (est.)" value={fmtGBP(result.next.netMonthly)} />
@@ -90,7 +113,7 @@ export function PayRiseImpactCalculator() {
         </div>
       </Card>
 
-      <div className="lg:col-span-2">
+      <div className="lg:col-span-2 pt-2">
         <HowItsCalculated
           bullets={[
             'We compute take-home for the current salary and the new salary using the same simplified UK tax/NI assumptions.',

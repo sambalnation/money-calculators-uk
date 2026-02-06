@@ -19,8 +19,8 @@ export function HowItsCalculated({
   children?: ReactNode;
 }) {
   return (
-    <details className="rounded-2xl border border-white/10 bg-bg-900/40 p-5">
-      <summary className="cursor-pointer select-none text-sm font-semibold text-white/75 outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/50 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-900">
+    <details className="border-t border-white/10 pt-4">
+      <summary className="cursor-pointer select-none text-sm font-semibold text-white/75 outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/50 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-950">
         {title}
       </summary>
 
@@ -36,7 +36,7 @@ export function HowItsCalculated({
         {children}
 
         {sources && sources.length > 0 ? (
-          <div className="rounded-xl border border-white/10 bg-bg-950/40 p-4">
+          <div className="border-t border-white/10 pt-3">
             <p className="text-xs font-semibold tracking-widest text-white/50">SOURCES</p>
             <ul className="mt-2 space-y-1 text-xs">
               {sources.map((s) => (
@@ -52,9 +52,7 @@ export function HowItsCalculated({
                 </li>
               ))}
             </ul>
-            <p className="mt-2 text-xs text-white/40">
-              Sources last verified: {SOURCES_LAST_VERIFIED} (updated when we review sources; not every release)
-            </p>
+            <p className="mt-2 text-xs text-white/40">Sources last verified: {SOURCES_LAST_VERIFIED}</p>
           </div>
         ) : null}
       </div>

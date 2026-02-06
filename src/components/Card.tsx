@@ -12,15 +12,13 @@ export function Card({
   subtitle?: string;
   children: ReactNode;
   /**
-   * "subtle" keeps calculators feeling embedded in the tab panel.
-   * "neon" is an optional accent style (kept for backwards-compat).
+   * "subtle" is the default calculator surface.
+   * "neon" is kept for backwards-compat but intentionally restrained.
    */
   variant?: CardVariant;
 }) {
   const surfaceClassName =
-    variant === 'neon'
-      ? 'border border-white/10 bg-bg-900 shadow-neon'
-      : 'ring-1 ring-white/10 bg-bg-950/20 shadow-none';
+    variant === 'neon' ? 'border border-white/10 bg-bg-900 shadow-none' : 'border border-white/10 bg-bg-950/20 shadow-none';
 
   return (
     <section className={`rounded-2xl p-5 ${surfaceClassName}`}>

@@ -141,197 +141,189 @@ export function Tabs<T extends string>({
   }, [activeId, menuOpen]);
 
   return (
-    <section className="rounded-2xl bg-bg-900/30 ring-1 ring-white/10">
-      {/* Sticky tab header (flat strip with divider; active tab uses underline). */}
-      <div className="sticky top-0 z-20 rounded-t-2xl">
-        <div className="rounded-t-2xl border-b border-white/10 bg-bg-950/60 backdrop-blur">
-          <div className="relative flex items-end gap-2 px-4">
-            <div
-              role="tablist"
-              aria-label={ariaLabel}
-              className="no-scrollbar flex flex-1 flex-nowrap gap-5 overflow-x-auto"
-              onKeyDown={(e) => {
-                // Roving tabs + automatic activation
-                if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
-                e.preventDefault();
+    <section>
+      {/* Flat sticky tab bar with bottom divider; content renders on the page background. */}
+      <div className="sticky top-0 z-20 border-b border-white/10 bg-bg-950/75 backdrop-blur">
+        <div className="relative flex items-end gap-2">
+          <div
+            role="tablist"
+            aria-label={ariaLabel}
+            className="no-scrollbar flex flex-1 flex-nowrap gap-5 overflow-x-auto"
+            onKeyDown={(e) => {
+              // Roving tabs + automatic activation
+              if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
+              e.preventDefault();
 
-                const count = visibleItems.length;
-                if (count === 0) return;
+              const count = visibleItems.length;
+              if (count === 0) return;
 
-                const current = activeIndex;
-                const next =
-                  e.key === 'Home'
-                    ? 0
-                    : e.key === 'End'
-                      ? count - 1
-                      : e.key === 'ArrowLeft'
-                        ? (current - 1 + count) % count
-                        : (current + 1) % count;
+              const current = activeIndex;
+              const next =
+                e.key === 'Home'
+                  ? 0
+                  : e.key === 'End'
+                    ? count - 1
+                    : e.key === 'ArrowLeft'
+                      ? (current - 1 + count) % count
+                      : (current + 1) % count;
 
-                const nextId = visibleItems[next]?.id;
-                if (!nextId) return;
+              const nextId = visibleItems[next]?.id;
+              if (!nextId) return;
 
-                tabRefs.current[next]?.focus();
-                onChange(nextId);
-              }}
-            >
-              {visibleItems.map((t, i) => {
-                const active = t.id === activeId;
-                return (
-                  <button
-                    key={t.id}
-                    ref={(el) => {
-                      tabRefs.current[i] = el;
-                    }}
-                    id={tabDomId(t.id)}
-                    role="tab"
-                    type="button"
-                    tabIndex={active ? 0 : -1}
-                    aria-selected={active}
-                    aria-controls={panelDomId(t.id)}
-                    onClick={() => onChange(t.id)}
-                    className={
-                      'relative -mb-px shrink-0 whitespace-nowrap border-b-2 px-1.5 py-3 text-xs font-semibold tracking-wide transition ' +
-                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/50 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-950 ' +
-                      (active
-                        ? 'border-neon-cyan/80 text-white'
-                        : 'border-transparent text-white/60 hover:border-white/20 hover:text-white/85')
-                    }
-                  >
-                    {t.label}
-                  </button>
-                );
-              })}
-            </div>
-
-            {showMore ? (
-              <div ref={menuRootRef} className="relative">
+              tabRefs.current[next]?.focus();
+              onChange(nextId);
+            }}
+          >
+            {visibleItems.map((t, i) => {
+              const active = t.id === activeId;
+              return (
                 <button
-                  ref={menuButtonRef}
+                  key={t.id}
+                  ref={(el) => {
+                    tabRefs.current[i] = el;
+                  }}
+                  id={tabDomId(t.id)}
+                  role="tab"
                   type="button"
-                  aria-haspopup="menu"
-                  aria-expanded={menuOpen}
+                  tabIndex={active ? 0 : -1}
+                  aria-selected={active}
+                  aria-controls={panelDomId(t.id)}
+                  onClick={() => onChange(t.id)}
                   className={
-                    'relative -mb-px inline-flex shrink-0 items-center gap-2 whitespace-nowrap border-b-2 px-1.5 py-3 text-xs font-semibold tracking-wide transition ' +
+                    'relative -mb-px shrink-0 whitespace-nowrap border-b-2 px-1.5 py-3 text-xs font-semibold tracking-wide transition ' +
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/50 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-950 ' +
-                    (menuOpen
-                      ? 'border-neon-cyan/70 text-white'
+                    (active
+                      ? 'border-neon-cyan/80 text-white'
                       : 'border-transparent text-white/60 hover:border-white/20 hover:text-white/85')
                   }
-                  onClick={() => setMenuOpen((v) => !v)}
+                >
+                  {t.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {showMore ? (
+            <div ref={menuRootRef} className="relative">
+              <button
+                ref={menuButtonRef}
+                type="button"
+                aria-haspopup="menu"
+                aria-expanded={menuOpen}
+                className={
+                  'relative -mb-px inline-flex shrink-0 items-center gap-2 whitespace-nowrap border-b-2 px-1.5 py-3 text-xs font-semibold tracking-wide transition ' +
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/50 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-950 ' +
+                  (menuOpen
+                    ? 'border-neon-cyan/70 text-white'
+                    : 'border-transparent text-white/60 hover:border-white/20 hover:text-white/85')
+                }
+                onClick={() => setMenuOpen((v) => !v)}
+                onKeyDown={(e) => {
+                  if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    setMenuOpen(true);
+                  }
+                  if (e.key === 'Escape') {
+                    e.preventDefault();
+                    setMenuOpen(false);
+                  }
+                }}
+              >
+                More
+                <span aria-hidden="true" className="text-white/40">
+                  ▾
+                </span>
+              </button>
+
+              {menuOpen ? (
+                <div
+                  ref={menuListRef}
+                  role="menu"
+                  aria-label="All calculators"
+                  className="absolute right-0 mt-2 w-64 overflow-hidden rounded-xl border border-white/10 bg-bg-950 shadow-lg"
                   onKeyDown={(e) => {
-                    if (e.key === 'ArrowDown') {
-                      e.preventDefault();
-                      setMenuOpen(true);
-                    }
-                    if (e.key === 'Escape') {
-                      e.preventDefault();
-                      setMenuOpen(false);
-                    }
+                    if (!menuListRef.current) return;
+                    if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(e.key)) return;
+                    e.preventDefault();
+
+                    const buttons = Array.from(
+                      menuListRef.current.querySelectorAll<HTMLButtonElement>('[role="menuitemradio"]'),
+                    );
+                    if (buttons.length === 0) return;
+
+                    const currentIndex = Math.max(0, buttons.findIndex((b) => b === document.activeElement));
+                    const nextIndex =
+                      e.key === 'Home'
+                        ? 0
+                        : e.key === 'End'
+                          ? buttons.length - 1
+                          : e.key === 'ArrowUp'
+                            ? (currentIndex - 1 + buttons.length) % buttons.length
+                            : (currentIndex + 1) % buttons.length;
+
+                    buttons[nextIndex]?.focus();
                   }}
                 >
-                  More
-                  <span aria-hidden="true" className="text-white/40">
-                    ▾
-                  </span>
-                </button>
-
-                {menuOpen ? (
-                  <div
-                    ref={menuListRef}
-                    role="menu"
-                    aria-label="All calculators"
-                    className="absolute right-0 mt-2 w-64 overflow-hidden rounded-xl border border-white/10 bg-bg-950 shadow-xl"
-                    onKeyDown={(e) => {
-                      if (!menuListRef.current) return;
-                      if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(e.key)) return;
-                      e.preventDefault();
-
-                      const buttons = Array.from(
-                        menuListRef.current.querySelectorAll<HTMLButtonElement>('[role="menuitemradio"]'),
-                      );
-                      if (buttons.length === 0) return;
-
-                      const currentIndex = Math.max(0, buttons.findIndex((b) => b === document.activeElement));
-                      const nextIndex =
-                        e.key === 'Home'
-                          ? 0
-                          : e.key === 'End'
-                            ? buttons.length - 1
-                            : e.key === 'ArrowUp'
-                              ? (currentIndex - 1 + buttons.length) % buttons.length
-                              : (currentIndex + 1) % buttons.length;
-
-                      buttons[nextIndex]?.focus();
-                    }}
-                  >
-                    <div className="border-b border-white/10 bg-bg-950/60 px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-white/50">
-                      All calculators
-                    </div>
-
-                    <div className="max-h-[70vh] overflow-auto p-1">
-                      {items.map((t) => {
-                        const active = t.id === activeId;
-                        return (
-                          <button
-                            key={t.id}
-                            id={`more-item-${t.id}`}
-                            type="button"
-                            role="menuitemradio"
-                            aria-checked={active}
-                            className={
-                              'flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm transition ' +
-                              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/40 ' +
-                              (active
-                                ? 'bg-white/5 text-white'
-                                : 'text-white/70 hover:bg-white/5 hover:text-white')
-                            }
-                            onClick={() => {
-                              onChange(t.id);
-                              setMenuOpen(false);
-                              menuButtonRef.current?.focus();
-                            }}
-                          >
-                            <span>{t.label}</span>
-                            {active ? (
-                              <span aria-hidden="true" className="text-neon-cyan">
-                                ✓
-                              </span>
-                            ) : null}
-                          </button>
-                        );
-                      })}
-                    </div>
+                  <div className="border-b border-white/10 bg-bg-950/60 px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-white/50">
+                    All calculators
                   </div>
-                ) : null}
-              </div>
-            ) : null}
 
-            {/* Subtle fade edges to hint horizontal scrolling on mobile */}
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute left-0 top-0 h-full w-6 bg-gradient-to-r from-bg-950/60 to-transparent"
-            />
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute right-0 top-0 h-full w-10 bg-gradient-to-l from-bg-950/60 to-transparent"
-            />
-          </div>
+                  <div className="max-h-[70vh] overflow-auto p-1">
+                    {items.map((t) => {
+                      const active = t.id === activeId;
+                      return (
+                        <button
+                          key={t.id}
+                          id={`more-item-${t.id}`}
+                          type="button"
+                          role="menuitemradio"
+                          aria-checked={active}
+                          className={
+                            'flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm transition ' +
+                            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/40 ' +
+                            (active
+                              ? 'bg-white/5 text-white'
+                              : 'text-white/70 hover:bg-white/5 hover:text-white')
+                          }
+                          onClick={() => {
+                            onChange(t.id);
+                            setMenuOpen(false);
+                            menuButtonRef.current?.focus();
+                          }}
+                        >
+                          <span>{t.label}</span>
+                          {active ? (
+                            <span aria-hidden="true" className="text-neon-cyan">
+                              ✓
+                            </span>
+                          ) : null}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+
+          {/* Subtle fade edges to hint horizontal scrolling on mobile */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute left-0 top-0 h-full w-6 bg-gradient-to-r from-bg-950/75 to-transparent"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute right-0 top-0 h-full w-10 bg-gradient-to-l from-bg-950/75 to-transparent"
+          />
         </div>
       </div>
 
       {/* Panels */}
-      <div className="px-4 pb-5 pt-4 text-sm text-white/80 sm:px-5 sm:pb-6 sm:pt-5">
+      <div className="pt-5 text-sm text-white/80">
         {items.map((t) => {
           const active = t.id === activeId;
           return (
-            <div
-              key={t.id}
-              id={panelDomId(t.id)}
-              role="tabpanel"
-              aria-labelledby={tabDomId(t.id)}
-              hidden={!active}
-            >
+            <div key={t.id} id={panelDomId(t.id)} role="tabpanel" aria-labelledby={tabDomId(t.id)} hidden={!active}>
               {t.content}
             </div>
           );

@@ -65,11 +65,11 @@ export function PensionContributionImpactCalculator() {
         <div className="grid gap-4">
           <NumberInput label="Gross annual salary" prefix="£" value={salary} onChange={setSalary} hint="annual" />
 
-          <div className="rounded-xl border border-white/10 bg-bg-900/40 p-4">
-            <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="border-t border-white/10 pt-4">
+            <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
                 <p className="text-sm font-medium text-white/80">Your contribution input</p>
-                <p className="text-xs text-white/50">We convert this to an annual gross contribution for the maths.</p>
+                <p className="mt-1 text-xs text-white/50">We convert this to an annual gross contribution for the maths.</p>
               </div>
               <Segmented
                 value={employeeMode}
@@ -93,29 +93,34 @@ export function PensionContributionImpactCalculator() {
                   hint="per month"
                 />
               )}
-              <NumberInput label="Employer contribution (optional)" value={employerPct} onChange={setEmployerPct} hint="%" />
+              <NumberInput
+                label="Employer contribution (optional)"
+                value={employerPct}
+                onChange={setEmployerPct}
+                hint="%"
+              />
             </div>
 
-            <div className="mt-4 grid gap-2 text-xs text-white/60">
-              <div className="flex items-center justify-between">
+            <div className="mt-4 divide-y divide-white/10 border-y border-white/10 text-xs text-white/60">
+              <div className="flex items-center justify-between gap-4 py-2">
                 <span>Employee gross contribution (annual)</span>
                 <span className="font-medium text-white/80">{fmtGBP0(result.inputs.employeeGrossAnnualContribution)}</span>
               </div>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-4 py-2">
                 <span>Employer contribution (annual)</span>
                 <span className="font-medium text-white/80">{fmtGBP0(result.inputs.employerGrossAnnualContribution)}</span>
               </div>
             </div>
           </div>
 
-          <div className="rounded-xl border border-white/10 bg-bg-900/40 p-4">
-            <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="border-t border-white/10 pt-4">
+            <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
                 <p className="text-sm font-medium text-white/80">Pension scheme type</p>
-                <p className="text-xs text-white/50">If you’re unsure, we’ll show a range.</p>
+                <p className="mt-1 text-xs text-white/50">If you’re unsure, we’ll show a range.</p>
               </div>
               <select
-                className="rounded-xl border border-white/10 bg-bg-900/70 px-3 py-2 text-sm text-white/80 outline-none"
+                className="rounded-xl border border-white/10 bg-bg-900/70 px-3 py-2 text-sm text-white/80 outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-950"
                 value={schemeMode}
                 onChange={(e) => setSchemeMode(e.target.value as SchemeMode)}
               >
@@ -126,7 +131,7 @@ export function PensionContributionImpactCalculator() {
               </select>
             </div>
 
-            <div className="mt-3 rounded-xl border border-white/10 bg-bg-900/30 p-3 text-xs text-white/60">
+            <div className="mt-4 text-xs text-white/60">
               <p className="font-medium text-white/70">Assumptions / caveats</p>
               <ul className="mt-2 list-disc space-y-1 pl-4">
                 <li>Tax year assumptions: {DEFAULT_UK_ASSUMPTIONS.taxYear} (rough estimate).</li>
@@ -134,25 +139,35 @@ export function PensionContributionImpactCalculator() {
                 <li>Employer contributions are assumed to be additional (not matched/conditional).</li>
                 <li>Relief-at-source assumes you claim no extra higher-rate relief here.</li>
               </ul>
-              <p className="mt-2">Educational estimates only — not financial advice.</p>
+              <p className="mt-3">Educational estimates only — not financial advice.</p>
             </div>
           </div>
         </div>
       </Card>
 
       <Card title="Results">
-        <div className="space-y-3">
-          <div className="grid gap-2 rounded-xl border border-white/10 bg-bg-900/40 p-4">
-            <Row label="Baseline net monthly (no pension)" value={fmtGBP(result.baseline.netMonthly)} accent="text-neon-cyan" />
-            <Row label="Baseline net annual" value={fmtGBP(result.baseline.netAnnual)} />
+        <div className="space-y-4">
+          <div className="divide-y divide-white/10 border-y border-white/10">
+            <div className="py-2">
+              <Row
+                label="Baseline net monthly (no pension)"
+                value={fmtGBP(result.baseline.netMonthly)}
+                accent="text-neon-cyan"
+              />
+            </div>
+            <div className="py-2">
+              <Row label="Baseline net annual" value={fmtGBP(result.baseline.netAnnual)} />
+            </div>
           </div>
 
           {shownScenarios.length === 1 ? (
             <ScenarioPanel scenario={result.scenarios[shownScenarios[0]]} />
           ) : (
-            <div className="rounded-xl border border-white/10 bg-bg-900/40 p-4">
+            <div className="border-t border-white/10 pt-4">
               <p className="text-sm font-medium text-white/80">Not sure mode: compare scenarios</p>
-              <p className="mt-1 text-xs text-white/50">Pick the one that matches your payslip/pension docs for the most accurate estimate.</p>
+              <p className="mt-1 text-xs text-white/50">
+                Pick the one that matches your payslip/pension docs for the most accurate estimate.
+              </p>
 
               <div className="mt-3 overflow-x-auto">
                 <table className="w-full min-w-[520px] text-left text-xs">
@@ -180,10 +195,10 @@ export function PensionContributionImpactCalculator() {
                 </table>
               </div>
 
-              <div className="mt-3 grid gap-2">
+              <div className="mt-4">
                 {shownScenarios.map((k) => (
-                  <details key={k} className="rounded-xl border border-white/10 bg-bg-900/30 p-3">
-                    <summary className="cursor-pointer select-none text-xs font-medium text-white/70 outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-900">
+                  <details key={k} className="border-t border-white/10 pt-3">
+                    <summary className="cursor-pointer select-none text-xs font-medium text-white/70 outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-950">
                       {result.scenarios[k].label} — notes
                     </summary>
                     <ul className="mt-2 list-disc space-y-1 pl-4 text-xs text-white/60">
@@ -199,7 +214,7 @@ export function PensionContributionImpactCalculator() {
         </div>
       </Card>
 
-      <div className="lg:col-span-2">
+      <div className="lg:col-span-2 pt-2">
         <HowItsCalculated
           bullets={[
             'We start with a baseline take-home estimate (income tax + employee NI) using the current tax year assumptions.',
@@ -217,27 +232,40 @@ export function PensionContributionImpactCalculator() {
   );
 }
 
-function ScenarioPanel({ scenario }: { scenario: ReturnType<typeof computePensionContributionImpact>['scenarios'][PensionSchemeType] }) {
+function ScenarioPanel({
+  scenario,
+}: {
+  scenario: ReturnType<typeof computePensionContributionImpact>['scenarios'][PensionSchemeType];
+}) {
   return (
-    <div className="rounded-xl border border-white/10 bg-bg-900/40 p-4">
+    <div className="border-t border-white/10 pt-4">
       <p className="text-sm font-medium text-white/80">{scenario.label}</p>
 
-      <div className="mt-3 grid gap-2">
-        <Row label="Net monthly (est.)" value={fmtGBP(scenario.netMonthly)} accent="text-neon-cyan" />
-        <Row label="Net annual (est.)" value={fmtGBP(scenario.netAnnual)} />
-        <div className="my-1 h-px bg-white/10" />
-        <Row label="Take-home change" value={`-${fmtGBP(scenario.takeHomeChangeMonthly)}/mo`} accent="text-neon-pink" />
-        <Row label="Total pension added" value={`${fmtGBP0(scenario.totalPensionAddedAnnual)}/yr`} accent="text-neon-lime" />
+      <div className="mt-3 divide-y divide-white/10 border-y border-white/10">
+        <div className="py-2">
+          <Row label="Net monthly (est.)" value={fmtGBP(scenario.netMonthly)} accent="text-neon-cyan" />
+        </div>
+        <div className="py-2">
+          <Row label="Net annual (est.)" value={fmtGBP(scenario.netAnnual)} />
+        </div>
+        <div className="py-2">
+          <Row label="Take-home change" value={`-${fmtGBP(scenario.takeHomeChangeMonthly)}/mo`} accent="text-neon-pink" />
+        </div>
+        <div className="py-2">
+          <Row label="Total pension added" value={`${fmtGBP0(scenario.totalPensionAddedAnnual)}/yr`} accent="text-neon-lime" />
+        </div>
       </div>
 
-      <div className="mt-3 rounded-xl border border-white/10 bg-bg-900/30 p-3">
-        <p className="text-xs font-medium text-white/70">Notes</p>
+      <details className="mt-3 border-t border-white/10 pt-3">
+        <summary className="cursor-pointer select-none text-xs font-medium text-white/70 outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-950">
+          Notes
+        </summary>
         <ul className="mt-2 list-disc space-y-1 pl-4 text-xs text-white/60">
           {scenario.notes.map((n) => (
             <li key={n}>{n}</li>
           ))}
         </ul>
-      </div>
+      </details>
     </div>
   );
 }
@@ -270,10 +298,8 @@ function Segmented<T extends string>({
             type="button"
             onClick={() => onChange(o.value)}
             className={
-              'rounded-lg px-3 py-1.5 text-xs font-medium transition ' +
-              (active
-                ? 'bg-white/10 text-white shadow-neon'
-                : 'text-white/60 hover:bg-white/5 hover:text-white/75')
+              'rounded-lg px-3 py-1.5 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/50 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-950 ' +
+              (active ? 'bg-white/10 text-white' : 'text-white/60 hover:bg-white/5 hover:text-white/75')
             }
           >
             {o.label}
