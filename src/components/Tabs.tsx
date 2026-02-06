@@ -141,10 +141,10 @@ export function Tabs<T extends string>({
   }, [activeId, menuOpen]);
 
   return (
-    <div>
+    <section className="rounded-2xl bg-bg-900/30 ring-1 ring-white/10">
       {/* Sticky tab header (flat strip with divider; active tab uses underline). */}
-      <div className="sticky top-0 z-20">
-        <div className="border-b border-white/10 bg-bg-950/70 backdrop-blur">
+      <div className="sticky top-0 z-20 rounded-t-2xl">
+        <div className="rounded-t-2xl border-b border-white/10 bg-bg-950/60 backdrop-blur">
           <div className="relative flex items-end gap-2 px-4">
             <div
               role="tablist"
@@ -310,18 +310,18 @@ export function Tabs<T extends string>({
             {/* Subtle fade edges to hint horizontal scrolling on mobile */}
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute left-0 top-0 h-full w-6 bg-gradient-to-r from-bg-950/70 to-transparent"
+              className="pointer-events-none absolute left-0 top-0 h-full w-6 bg-gradient-to-r from-bg-950/60 to-transparent"
             />
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute right-0 top-0 h-full w-10 bg-gradient-to-l from-bg-950/70 to-transparent"
+              className="pointer-events-none absolute right-0 top-0 h-full w-10 bg-gradient-to-l from-bg-950/60 to-transparent"
             />
           </div>
         </div>
       </div>
 
       {/* Panels */}
-      <div className="pt-0">
+      <div className="px-4 pb-5 pt-4 text-sm text-white/80 sm:px-5 sm:pb-6 sm:pt-5">
         {items.map((t) => {
           const active = t.id === activeId;
           return (
@@ -331,13 +331,12 @@ export function Tabs<T extends string>({
               role="tabpanel"
               aria-labelledby={tabDomId(t.id)}
               hidden={!active}
-              className="pt-4 sm:pt-5"
             >
               {t.content}
             </div>
           );
         })}
       </div>
-    </div>
+    </section>
   );
 }
