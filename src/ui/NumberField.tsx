@@ -5,7 +5,7 @@ import { Field } from './Field';
 import { tokens } from './tokens';
 
 function parseNumber(raw: string) {
-  const cleaned = raw.replace(/[^0-9.\-]/g, '');
+  const cleaned = raw.replace(/[^0-9.-]/g, '');
   const n = Number(cleaned);
   return Number.isFinite(n) ? n : 0;
 }
