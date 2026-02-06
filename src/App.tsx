@@ -29,6 +29,8 @@ function formatLastUpdated(iso: string) {
   return d.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: '2-digit' });
 }
 
+const SOURCES_LAST_VERIFIED = '6 Feb 2026';
+
 export default function App() {
   const items: TabItem<ToolId>[] = useMemo(
     () => [
@@ -110,7 +112,7 @@ export default function App() {
               </li>
             </ul>
             <p className="mt-3 text-xs text-white/50">
-              Sources last verified: 6 Feb 2026. We don't track you. We don't store inputs. Double-check results against official calculators/payroll when making decisions.
+              Sources last verified: {SOURCES_LAST_VERIFIED} (updated when we review sources; not every release). We don't track you. We don't store inputs. Double-check results against official calculators/payroll when making decisions.
             </p>
           </section>
 
