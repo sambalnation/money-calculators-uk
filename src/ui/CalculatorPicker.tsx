@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 
 import { cx } from './cx';
 import { ModalSheet } from './Modal';
+import { PageContainer } from './Page';
 import { tokens } from './tokens';
 
 export type CalculatorItem<T extends string> = {
@@ -25,9 +26,16 @@ export function CalculatorPicker<T extends string>({
 
   return (
     <>
-      <div className="sticky top-0 z-30 border-b border-white/10 bg-bg-950/75 backdrop-blur">
-        <div className="mx-auto max-w-5xl px-4">
-          <div className="flex items-center justify-between gap-4 py-3">
+      <div className="sticky top-0 z-30">
+        <PageContainer className="py-3">
+          <div
+            className={cx(
+              tokens.radii.panel,
+              tokens.border.subtle,
+              tokens.surfaces.panel,
+              'flex items-center justify-between gap-4 px-4 py-3',
+            )}
+          >
             <div className="min-w-0">
               <p className="text-[11px] font-semibold uppercase tracking-widest text-white/45">Calculator</p>
               <p className="truncate text-sm font-semibold text-white/85">{active?.label ?? '—'}</p>
@@ -52,7 +60,7 @@ export function CalculatorPicker<T extends string>({
               </span>
             </button>
           </div>
-        </div>
+        </PageContainer>
       </div>
 
       <ModalSheet
